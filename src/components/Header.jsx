@@ -6,7 +6,7 @@ export default function Header(){
   const tr = useTr(), lang = getLang();
   return (
     <header className="top"><div className="top-in gut">
-      <div className="brand"><span className="mark">Thumb Builder</span><span className="tag">{tr('header.tagline')}</span></div>
+      <div className="brand"><span className="mark">Thumbnail Builder</span><span className="by">by <a href="https://giovannafilms.com" target="_blank" rel="noopener noreferrer">giovannafilms</a></span></div>
       <div className="lang" role="group" aria-label={tr('header.language')}>
         {LANGS.map((L, i) => (
           <Fragment key={L.id}>

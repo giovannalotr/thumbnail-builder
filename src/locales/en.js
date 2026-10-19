@@ -1,6 +1,5 @@
 /* Textos da interface em inglês. Mesmas chaves de pt-BR.js. */
 export default {
-  'header.tagline': 'thumbnails from your stills',
   'header.language': 'Language',
 
   'files.none': 'No images found. Upload JPG, PNG or WebP files.',
@@ -10,7 +9,7 @@ export default {
   'files.failedSome': 'Couldn’t open: {names}. Use JPG, PNG or WebP.',
   'files.drop': 'Drop your stills here',
 
-  'stills.title': 'Stills',
+  'stills.title': 'Stills / images',
   'stills.count_one': '{n} still uploaded · original resolution kept on export',
   'stills.count_other': '{n} stills uploaded · original resolution kept on export',
   'stills.formats': 'JPG, PNG or WebP at original resolution',
@@ -79,7 +78,7 @@ export default {
   'mine.empty': 'No saved templates yet. Edit a template and click Save, or import a .json file.',
   'mine.imported_one': 'Template imported into My templates.',
   'mine.imported_other': '{n} templates imported into My templates.',
-  'mine.importFailed': 'Couldn’t import: {names}. The file isn’t a Thumb Builder template.',
+  'mine.importFailed': 'Couldn’t import: {names}. The file isn’t a Thumbnail Builder template.',
   'mine.untitled': 'Untitled template',
   'mine.deleted': 'Template “{name}” deleted.',
   'card.menu': 'More options for {name}',

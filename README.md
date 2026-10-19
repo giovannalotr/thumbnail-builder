@@ -1,4 +1,4 @@
-# Thumb Builder
+# Thumbnail Builder
 
 Monta thumbnails de vídeo a partir de stills: 12 templates, filtros de cor, textos e bordas editáveis, exportação em JPG ou PNG.
 Tudo roda no navegador; nenhuma imagem é enviada para servidor.

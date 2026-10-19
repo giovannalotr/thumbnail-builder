@@ -6,6 +6,7 @@
   --bg:#ECE7DF; --panel:#F6F3EE; --raise:#FFFDF9; --ink:#2A2521; --muted:#776D63; --line:#DAD1C4;
   --accent:#55603F; --accent-ink:#F6F3EE; --soft:#E3DDD2; --danger:#9A4A3A;
   --f-display:"Gilda Display", Georgia, "Times New Roman", serif;
+  --f-brand:"Cormorant Garamond", Georgia, "Times New Roman", serif;
   --f-ui:"Hanken Grotesk", "Segoe UI", system-ui, sans-serif;
   --r:8px; --stage:transparent; --stage-ink:var(--muted); --stage-fg:var(--ink);
 }
@@ -27,10 +28,12 @@ button{cursor:pointer}
 
 .top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--panel);border-bottom:1px solid var(--line)}
 .top-in{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-block:12px;max-width:1480px;margin:0 auto}
-.brand{display:flex;align-items:baseline;gap:12px;min-width:0}
-.mark{font-family:var(--f-display);font-size:26px;letter-spacing:.01em;white-space:nowrap}
-.tag{color:var(--muted);font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-@media (max-width:620px){.tag{display:none}}
+.brand{display:flex;align-items:baseline;gap:10px;min-width:0}
+.mark{font-family:var(--f-brand);font-weight:500;font-size:30px;line-height:1.1;letter-spacing:.015em;white-space:nowrap}
+.by{color:var(--muted);font-size:11.5px;letter-spacing:.04em;white-space:nowrap;opacity:.8}
+.by a{color:inherit;text-decoration:none}
+.by a:hover{color:var(--ink);text-decoration:underline;text-underline-offset:2px}
+@media (max-width:620px){.brand{flex-direction:column;align-items:flex-start;gap:1px}.mark{font-size:26px}}
 .lang{display:flex;align-items:center;gap:8px}
 .lang button{position:relative;border:0;background:none;padding:6px 1px;font-size:12px;font-weight:600;line-height:1;letter-spacing:.08em;color:var(--muted)}
 .lang button:hover{color:var(--ink)}

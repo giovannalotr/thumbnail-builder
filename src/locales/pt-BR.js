@@ -1,7 +1,6 @@
 /* Textos da interface em português do Brasil, o idioma padrão. en.js tem as mesmas chaves.
    Chaves com _one e _other são as formas de plural escolhidas pelo parâmetro n (ver tr em lib/i18n.js). */
 export default {
-  'header.tagline': 'thumbnails a partir das suas stills',
   'header.language': 'Idioma',
 
   'files.none': 'Nenhuma imagem encontrada. Envie arquivos JPG, PNG ou WebP.',
@@ -11,7 +10,7 @@ export default {
   'files.failedSome': 'Não abri: {names}. Use JPG, PNG ou WebP.',
   'files.drop': 'Solte as stills aqui',
 
-  'stills.title': 'Stills',
+  'stills.title': 'Stills / imagens',
   'stills.count_one': '{n} still enviada · resolução original preservada na exportação',
   'stills.count_other': '{n} stills enviadas · resolução original preservada na exportação',
   'stills.formats': 'JPG, PNG ou WebP em resolução original',
@@ -80,7 +79,7 @@ export default {
   'mine.empty': 'Nenhum template salvo ainda. Edite um template e clique em Salvar, ou importe um arquivo .json.',
   'mine.imported_one': 'Template importado para Meus templates.',
   'mine.imported_other': '{n} templates importados para Meus templates.',
-  'mine.importFailed': 'Não consegui importar: {names}. O arquivo não é um template do Thumb Builder.',
+  'mine.importFailed': 'Não consegui importar: {names}. O arquivo não é um template do Thumbnail Builder.',
   'mine.untitled': 'Template sem nome',
   'mine.deleted': 'Template “{name}” excluído.',
   'card.menu': 'Mais opções de {name}',
