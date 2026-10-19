@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Editor from './components/Editor.jsx';
 import GridView from './components/GridView.jsx';
 import Header from './components/Header.jsx';
@@ -8,6 +8,7 @@ import { exportTpls } from './lib/exporter.js';
 import { makeGrade } from './lib/grade.js';
 import { decodeImages, isImageFile } from './lib/images.js';
 import { toast } from './lib/toast.js';
+import { makeMine, mineStore, writeMine } from './lib/userTemplates.js';
 import { useStore, useTr } from './state.js';
 
 function useDebounced(value, ms){
@@ -19,10 +20,11 @@ function useDebounced(value, ms){
 export default function App(){
   const [state, actions] = useStore();
   const tr = useTr();
+  // editing é a key do template aberto no editor; o histórico de desfazer fica guardado por key
   const [editing, setEditing] = useState(null);
   const [edTab, setEdTab] = useState('imagens');
   const [dropping, setDropping] = useState(false);
-  const [histories] = useState(() => state.tpls.map(() => ({ undo: [], redo: [], last: null })));
+  const histories = useRef({}).current;
   const { images, imgVer, filter, amt, grain, vig, prevBg, archived } = state;
   const grade = useMemo(() => makeGrade(filter, amt, grain, vig), [filter, amt, grain, vig]);
   const env = useMemo(() => ({ images, imgVer, grade }), [images, imgVer, grade]);
@@ -35,6 +37,8 @@ export default function App(){
     try { localStorage.setItem('tb-prevbg', prevBg); } catch (e){}
   }, [prevBg]);
   useEffect(() => { try { localStorage.setItem('tb-archived', JSON.stringify(archived)); } catch (e){} }, [archived]);
+  const mineJson = useMemo(() => mineStore(state.tpls), [state.tpls]);
+  useEffect(() => writeMine(mineJson), [mineJson]);
 
   const loadFiles = useCallback(async files => {
     const list = [...files].filter(isImageFile);
@@ -64,14 +68,20 @@ export default function App(){
   };
   const onExport = idxs => exportTpls(idxs, { tpls: state.tpls, size: state.size, fmt: state.fmt, env });
   const setPrevBg = v => actions.set('prevBg', v);
+  const ei = editing == null ? -1 : state.tpls.findIndex(t => t.key === editing);
+  // Salvar um template padrão cria uma cópia em "Meus templates", e o editor passa a editar a cópia
+  const saveAs = name => {
+    const t = state.tpls[ei], m = makeMine({ name, base: t.def.id, slots: t.slots, texts: t.texts, border: t.border });
+    actions.addTemplates([m]); setEditing(m.key);
+  };
 
   return (
     <>
       <Header />
-      {editing == null
-        ? <GridView state={state} actions={actions} env={gridEnv} onEdit={setEditing} onExport={onExport} onFiles={loadFiles} onRemoveImage={removeImage} />
-        : <Editor key={editing} index={editing} tpl={state.tpls[editing]} images={images} env={env} actions={actions} history={histories[editing]}
-            tab={edTab} setTab={setEdTab} prevBg={prevBg} onPrevBg={setPrevBg} onClose={() => setEditing(null)} onExport={onExport} />}
+      {ei < 0
+        ? <GridView state={state} actions={actions} env={gridEnv} onEdit={i => setEditing(state.tpls[i].key)} onExport={onExport} onFiles={loadFiles} onRemoveImage={removeImage} />
+        : <Editor key={editing} index={ei} tpl={state.tpls[ei]} images={images} env={env} actions={actions} history={histories[editing] || (histories[editing] = { undo: [], redo: [], last: null })}
+            tab={edTab} setTab={setEdTab} prevBg={prevBg} onPrevBg={setPrevBg} onClose={() => setEditing(null)} onExport={onExport} onSaveAs={saveAs} />}
       <div id="drop" hidden={!dropping}>{tr('files.drop')}</div>
       <Toast />
     </>

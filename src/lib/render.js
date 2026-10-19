@@ -42,7 +42,7 @@ function photoLayer(t, ti, W, H, hi, env){
 }
 const PHOTO = new Map();
 function cachedPhoto(t, ti, W, H, env){
-  const key = JSON.stringify([t.slots, t.border.outer, t.border.gap, t.border.radius, t.border.blend, env.imgVer, env.grade.key, env.images.length]);
+  const key = JSON.stringify([t.def.id, t.slots, t.border.outer, t.border.gap, t.border.radius, t.border.blend, env.imgVer, env.grade.key, env.images.length]);
   const ck = ti + ':' + W, hit = PHOTO.get(ck);
   if (hit && hit.key === key) return hit.c;
   const c = photoLayer(t, ti, W, H, false, env); PHOTO.set(ck, { key, c }); return c;

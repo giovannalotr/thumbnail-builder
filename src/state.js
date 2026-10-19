@@ -3,6 +3,7 @@ import { getLang, onLang, tr } from './lib/i18n.js';
 import { imgFor } from './lib/render.js';
 import { sampleImages } from './lib/samples.js';
 import { DEFS, makeTpl } from './lib/templates.js';
+import { readMine, saveMine } from './lib/userTemplates.js';
 
 function readPrevBg(){ try { return localStorage.getItem('tb-prevbg') || 'auto'; } catch (e){ return 'auto'; } }
 function readArchived(){
@@ -10,10 +11,10 @@ function readArchived(){
 }
 const initialState = () => ({
   images: sampleImages(), imgVer: 0, filter: 'natural', amt: 1, grain: 0, vig: 0, size: 1920, fmt: 'jpg',
-  prevBg: readPrevBg(), tpls: DEFS.map(makeTpl), archived: readArchived(), showArchived: false,
+  prevBg: readPrevBg(), tpls: [...DEFS.map(makeTpl), ...readMine()], archived: readArchived(), showArchived: false,
 });
 const replaceAt = (a, i, v) => a.map((x, k) => k === i ? v : x);
-const isArchived = (s, t) => s.archived.includes(t.def.id);
+const isArchived = (s, t) => s.archived.includes(t.key);
 const clearSlots = (tpls, test) => tpls.map(t => t.slots.some(test) ? { ...t, slots: t.slots.map(sl => test(sl) ? { ...sl, img: null } : sl) } : t);
 
 function shuffled(a){ a = a.slice(); for (let i = a.length - 1; i > 0; i--){ const j = Math.random() * (i + 1) | 0; [a[i], a[j]] = [a[j], a[i]]; } return a; }
@@ -33,8 +34,9 @@ export function shuffleTpl(t, ti, images){
 
 /* Estado do app inteiro. Toda mudança gera objetos novos, então os componentes
    comparam slots, textos e bordas por referência para saber o que redesenhar.
-   archived guarda os ids dos templates arquivados; as ações em lote (selecionar todos,
-   embaralhar, aplicar bordas) não mexem neles. */
+   tpls tem os 12 templates padrão e, depois deles, os de "Meus templates" (mine: true);
+   cada um tem uma key fixa. archived guarda as keys dos templates padrão arquivados;
+   as ações em lote (selecionar todos, embaralhar, aplicar bordas) não mexem neles. */
 export function useStore(){
   const [state, setState] = useState(initialState);
   const actions = useMemo(() => ({
@@ -57,10 +59,14 @@ export function useStore(){
     borderAll: i => setState(s => ({ ...s, tpls: s.tpls.map((t, k) => k === i || isArchived(s, t) ? t : { ...t, border: { ...s.tpls[i].border }, edited: true }) })),
     // Template arquivado sai da seleção, para não entrar no "Baixar selecionados"
     archive: (i, on) => setState(s => {
-      const t = s.tpls[i], archived = s.archived.filter(id => id !== t.def.id);
-      if (on) archived.push(t.def.id);
+      const t = s.tpls[i], archived = s.archived.filter(k => k !== t.key);
+      if (on) archived.push(t.key);
       return { ...s, archived, tpls: on && t.pick ? replaceAt(s.tpls, i, { ...t, pick: false }) : s.tpls };
     }),
+    addTemplates: added => setState(s => ({ ...s, tpls: [...s.tpls, ...added] })),
+    saveTemplate: i => setState(s => ({ ...s, tpls: replaceAt(s.tpls, i, saveMine(s.tpls[i])) })),
+    renameTemplate: (i, name) => setState(s => ({ ...s, tpls: replaceAt(s.tpls, i, { ...s.tpls[i], name }) })),
+    removeTemplate: key => setState(s => ({ ...s, tpls: s.tpls.filter(t => t.key !== key) })),
   }), []);
   return [state, actions];
 }

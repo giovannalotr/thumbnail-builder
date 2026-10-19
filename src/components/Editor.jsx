@@ -3,11 +3,13 @@ import { needFonts } from '../lib/fonts.js';
 import { imgFor, renderTpl } from '../lib/render.js';
 import { makeTpl, slotGeo, slotRects, textAnchors, tplName } from '../lib/templates.js';
 import { toast } from '../lib/toast.js';
+import { isDirty, revertMine } from '../lib/userTemplates.js';
 import { BW, clamp, patchIn, setIn } from '../lib/util.js';
 import { shuffleTpl, useTr } from '../state.js';
 import { BordersPanel, ImagesPanel, TextsPanel } from './EditorPanels.jsx';
 import PreviewBgPicker from './PreviewBgPicker.jsx';
-import { IconDownload, IconRedo, IconShuffle, IconSwap, IconUndo } from './icons.jsx';
+import { useDismiss } from './controls.jsx';
+import { IconDownload, IconRedo, IconSave, IconShuffle, IconSwap, IconUndo } from './icons.jsx';
 
 const TABS = ['imagens', 'textos', 'bordas'];
 const snap = t => JSON.stringify({ slots: t.slots, texts: t.texts, border: t.border });
@@ -18,8 +20,9 @@ function snapTo(list, v, tol){
   return p == null ? null : { p, lines: list.filter(a => Math.abs(a.p - p) < 1e-4) };
 }
 
-/* history = { undo, redo, last } e a aba ficam no App, então sobrevivem quando o editor fecha e abre de novo */
-export default function Editor({ index, tpl, images, env, actions, history, tab, setTab, prevBg, onPrevBg, onClose, onExport }){
+/* history = { undo, redo, last } e a aba ficam no App, então sobrevivem quando o editor fecha e abre de novo.
+   onSaveAs(nome) guarda uma cópia de um template padrão em "Meus templates". */
+export default function Editor({ index, tpl, images, env, actions, history, tab, setTab, prevBg, onPrevBg, onClose, onExport, onSaveAs }){
   const tr = useTr();
   const [textSel, setTextSel] = useState(0);
   const [slotSel, setSlotSel] = useState(0);
@@ -31,9 +34,12 @@ export default function Editor({ index, tpl, images, env, actions, history, tab,
   const [fontTick, setFontTick] = useState(0);
   const [armed, setArmed] = useState(false);
   const [swap, setSwap] = useState(null);
+  const [saveName, setSaveName] = useState(null);
   const [, bump] = useReducer(n => n + 1, 0);
   const wrapRef = useRef(null), cvsRef = useRef(null), pbRef = useRef(null);
-  const boxesRef = useRef([]), swapRef = useRef(null), armRef = useRef(0), wheelRef = useRef(null), revealSlot = useRef(false);
+  const boxesRef = useRef([]), swapRef = useRef(null), armRef = useRef(0), wheelRef = useRef(null), revealSlot = useRef(false), saveRef = useRef(null);
+  const dirty = isDirty(tpl);
+  useDismiss(saveRef, saveName != null, () => setSaveName(null));
 
   const edit = fn => actions.editTpl(index, fn);
   const setPath = (path, v) => edit(t => setIn(t, path, v));
@@ -67,8 +73,9 @@ export default function Editor({ index, tpl, images, env, actions, history, tab,
       const ae = document.activeElement || document.body;
       if (e.key === 'Escape'){ if (!/INPUT|TEXTAREA|SELECT/.test(ae.tagName)) close(); return; }
       if (!(e.ctrlKey || e.metaKey) || e.altKey) return;
-      if (ae.tagName === 'TEXTAREA' || (ae.tagName === 'INPUT' && ae.type === 'text')) return;
       const k = e.key.toLowerCase();
+      if (k === 's'){ e.preventDefault(); save(); return; }
+      if (ae.tagName === 'TEXTAREA' || (ae.tagName === 'INPUT' && ae.type === 'text')) return;
       if (k === 'z' && !e.shiftKey){ e.preventDefault(); undo(); }
       else if ((k === 'z' && e.shiftKey) || k === 'y'){ e.preventDefault(); redo(); }
     };
@@ -212,8 +219,18 @@ export default function Editor({ index, tpl, images, env, actions, history, tab,
     if (!armed){ setArmed(true); clearTimeout(armRef.current); armRef.current = setTimeout(() => setArmed(false), 3500); return; }
     clearTimeout(armRef.current); setArmed(false);
     commit(tpl); history.redo = [];
-    actions.setTpl(index, t => ({ ...makeTpl(t.def), pick: t.pick }));
-    setTextSel(0); setSlotSel(0); bump(); toast(tr('editor.resetDone'));
+    // Template salvo volta à última versão salva; template padrão volta ao original
+    actions.setTpl(index, t => t.mine ? revertMine(t) : { ...makeTpl(t.def), pick: t.pick });
+    setTextSel(0); setSlotSel(0); bump(); toast(tr(tpl.mine ? 'editor.reverted' : 'editor.resetDone'));
+  }
+  function save(){
+    if (!tpl.mine){ if (saveName == null) setSaveName(tplName(tpl)); return; }
+    if (!dirty){ toast(tr('editor.nothingToSave'), 1200); return; }
+    actions.saveTemplate(index); toast(tr('editor.saved'));
+  }
+  function saveAs(e){
+    e.preventDefault();
+    commit(tpl); onSaveAs(saveName.trim() || tr('mine.untitled')); toast(tr('editor.savedNew'), 4000);
   }
   useEffect(() => () => clearTimeout(armRef.current), []);
   function shuffle(){
@@ -231,13 +248,32 @@ export default function Editor({ index, tpl, images, env, actions, history, tab,
     <section id="editView">
       <div className="ed-top gut">
         <button className="btn ghost" onClick={close}>{tr('editor.back')}</button>
-        <h2>{tplName(tpl)}</h2>
+        {tpl.mine
+          ? <div className="ed-title">
+              <input className="ed-name" value={tpl.name} maxLength={80} aria-label={tr('editor.saveName')} title={tr('editor.rename')}
+                onChange={e => actions.renameTemplate(index, e.target.value)} onBlur={e => { if (!e.target.value.trim()) actions.renameTemplate(index, tr('mine.untitled')); }} />
+              <span className="note">{tr('card.base', { name: tr('tpl.' + tpl.def.id) })}</span>
+            </div>
+          : <h2>{tplName(tpl)}</h2>}
         <div className="ed-act">
           <PreviewBgPicker value={prevBg} onChange={onPrevBg} />
           <button className="icon-btn" title={tr('editor.undoTitle')} aria-label={tr('editor.undo')} disabled={!history.undo.length} onClick={undo}><IconUndo /></button>
           <button className="icon-btn" title={tr('editor.redoTitle')} aria-label={tr('editor.redo')} disabled={!history.redo.length} onClick={redo}><IconRedo /></button>
           <button className="btn" onClick={shuffle}><IconShuffle />{tr('editor.shuffle')}</button>
-          <button className="btn ghost" onClick={reset}>{tr(armed ? 'editor.resetConfirm' : 'editor.reset')}</button>
+          <button className="btn ghost" disabled={tpl.mine && !dirty} onClick={reset}>{tr(tpl.mine ? (armed ? 'editor.revertConfirm' : 'editor.revert') : (armed ? 'editor.resetConfirm' : 'editor.reset'))}</button>
+          <div className="save-wrap" ref={saveRef}>
+            <button className="btn" disabled={tpl.mine && !dirty} title={tr(tpl.mine ? 'editor.saveTitleMine' : 'editor.saveTitleDefault')} onClick={save}><IconSave />{tr('editor.save')}</button>
+            {saveName != null && (
+              <form className="save-pop" onSubmit={saveAs}>
+                <label htmlFor="saveName">{tr('editor.saveName')}</label>
+                <input id="saveName" autoFocus value={saveName} maxLength={80} onChange={e => setSaveName(e.target.value)} />
+                <div className="row">
+                  <button type="button" className="btn ghost" onClick={() => setSaveName(null)}>{tr('editor.cancel')}</button>
+                  <button type="submit" className="btn primary">{tr('editor.saveConfirm')}</button>
+                </div>
+              </form>
+            )}
+          </div>
           <button className="btn primary" onClick={() => onExport([index])}><IconDownload />{tr('common.download')}</button>
         </div>
       </div>

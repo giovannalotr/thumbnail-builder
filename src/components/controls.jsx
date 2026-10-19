@@ -1,7 +1,8 @@
-import { useEffect, useId, useRef } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import { fmtNum } from '../lib/i18n.js';
 import { paintTexture } from '../lib/textures.js';
 import { useTr } from '../state.js';
+import { IconMore } from './icons.jsx';
 
 const FMT = { pct: v => Math.round(v * 100) + '%', px: v => Math.round(v) + ' px', em: v => (v * 100).toFixed(0) + '%', x: v => fmtNum(v, 2) + '×', pos: v => Math.round(v * 100) + '%', off: v => Math.round(v * 100) };
 
@@ -38,4 +39,34 @@ export function TexSwatch({ id, color, amt }){
     paintTexture(x, id, Math.max(amt, .7), 1, c.width, c.height);
   }, [id, color, amt]);
   return <canvas ref={ref} width="160" height="106" />;
+}
+
+/* Fecha um popup com um clique fora dele ou com Esc (sem que o Esc chegue ao editor) */
+export function useDismiss(ref, open, onClose){
+  useEffect(() => {
+    if (!open) return;
+    const down = e => { if (!ref.current.contains(e.target)) onClose(); };
+    const key = e => { if (e.key === 'Escape'){ e.stopPropagation(); onClose(); } };
+    document.addEventListener('pointerdown', down); document.addEventListener('keydown', key, true);
+    return () => { document.removeEventListener('pointerdown', down); document.removeEventListener('keydown', key, true); };
+  }, [open]);
+}
+
+/* Botão "⋯" com uma lista de ações: items = [{ id, label, run, confirm, danger }].
+   Com confirm, o primeiro clique troca o rótulo pelo texto de confirmação e só o segundo executa. */
+export function Menu({ label, items }){
+  const [open, setOpen] = useState(false), [armed, setArmed] = useState(null), ref = useRef(null);
+  const close = () => { setOpen(false); setArmed(null); };
+  useDismiss(ref, open, close);
+  const choose = it => { if (it.confirm && armed !== it.id){ setArmed(it.id); return; } close(); it.run(); };
+  return (
+    <div className="menu" ref={ref}>
+      <button className="icon-btn" aria-haspopup="menu" aria-expanded={open} aria-label={label} title={label} onClick={() => open ? close() : setOpen(true)}><IconMore /></button>
+      {open && (
+        <div className="menu-list" role="menu">
+          {items.map(it => <button key={it.id} role="menuitem" className={it.danger ? 'danger' : undefined} onClick={() => choose(it)}>{armed === it.id ? it.confirm : it.label}</button>)}
+        </div>
+      )}
+    </div>
+  );
 }

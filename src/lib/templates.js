@@ -53,13 +53,14 @@ export function makeText(o){
     box: Object.assign({ mode: 'none', color: '#1E1A16', op: .25, blur: 12, px: 28, py: 12, r: 6, line: false }, o.box || {}),
   });
 }
-const makeBorder = o => Object.assign({ outer: 0, gap: 0, radius: 0, color: '#EDE6D6', tex: 'grao', amt: .55, blend: 0 }, o);
-function countSlots(n){ return n === 0 ? 1 : n === 'x' ? 0 : n.k.reduce((a, c) => a + countSlots(c), 0); }
+export const makeBorder = o => Object.assign({ outer: 0, gap: 0, radius: 0, color: '#EDE6D6', tex: 'grao', amt: .55, blend: 0 }, o);
+export function countSlots(n){ return n === 0 ? 1 : n === 'x' ? 0 : n.k.reduce((a, c) => a + countSlots(c), 0); }
 export function makeTpl(def){
-  return { def, slots: Array.from({ length: countSlots(def.layout) }, () => ({ img: null, zoom: 1, px: 0, py: 0, flip: false })),
+  return { key: def.id, def, slots: Array.from({ length: countSlots(def.layout) }, () => ({ img: null, zoom: 1, px: 0, py: 0, flip: false })),
     texts: def.texts.map(o => makeText(JSON.parse(JSON.stringify(o)))), border: makeBorder(def.border), pick: false, edited: false };
 }
-export const tplName = t => tr('tpl.' + t.def.id);
+/* Nome para a interface: o que a pessoa deu, nos templates salvos, ou o nome traduzido do template padrão */
+export const tplName = t => t.mine ? t.name : tr('tpl.' + t.def.id);
 function lay(n, x, y, w, h, g, out){
   if (n === 0){ out.push({ x, y, w, h }); return; }
   if (n === 'x') return;
