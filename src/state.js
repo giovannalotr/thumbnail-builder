@@ -35,7 +35,7 @@ export function shuffleTpl(t, ti, images){
    comparam slots, textos e bordas por referência para saber o que redesenhar.
    tpls tem os 12 templates padrão e, depois deles, os de "Meus templates" (mine: true);
    cada um tem uma key fixa. archived guarda as keys dos templates padrão arquivados;
-   as ações em lote (selecionar todos, embaralhar, aplicar bordas) não mexem neles. */
+   as ações em lote (embaralhar, aplicar bordas) não mexem neles, e a grade não oferece selecioná-los. */
 export function useStore(){
   const [state, setState] = useState(initialState);
   const actions = useMemo(() => ({
@@ -52,10 +52,7 @@ export function useStore(){
     setTpl: (i, fn) => setState(s => ({ ...s, tpls: replaceAt(s.tpls, i, fn(s.tpls[i])) })),
     editTpl: (i, fn) => setState(s => ({ ...s, tpls: replaceAt(s.tpls, i, { ...fn(s.tpls[i]), edited: true }) })),
     setPick: (i, pick) => setState(s => ({ ...s, tpls: replaceAt(s.tpls, i, { ...s.tpls[i], pick }) })),
-    toggleAll: () => setState(s => {
-      const all = s.tpls.every(t => t.pick || isArchived(s, t));
-      return { ...s, tpls: s.tpls.map(t => isArchived(s, t) ? t : { ...t, pick: !all }) };
-    }),
+    pickAll: (keys, pick) => setState(s => ({ ...s, tpls: s.tpls.map(t => keys.includes(t.key) ? { ...t, pick } : t) })),
     shuffleAll: () => setState(s => ({ ...s, tpls: s.tpls.map((t, ti) => isArchived(s, t) ? t : shuffleTpl(t, ti, s.images)) })),
     borderAll: i => setState(s => ({ ...s, tpls: s.tpls.map((t, k) => k === i || isArchived(s, t) ? t : { ...t, border: { ...s.tpls[i].border }, edited: true }) })),
     // Template arquivado sai da seleção, para não entrar no "Baixar selecionados"

@@ -53,8 +53,6 @@ export default {
   'preview.note': 'vale para todos os templates',
   'grid.selectAll': 'Selecionar todos',
   'grid.clearSelection': 'Limpar seleção',
-  'grid.selected_one': '{n} selecionado',
-  'grid.selected_other': '{n} selecionados',
   'grid.format': 'Formato',
   'grid.download': 'Baixar selecionados',
   'grid.downloadN': 'Baixar {n} selecionados',

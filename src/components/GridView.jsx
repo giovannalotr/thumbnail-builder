@@ -15,7 +15,12 @@ const SIZES = [1280, 1920, 2560, 3840];
 export default function GridView({ state, actions, env, onEdit, onExport, onFiles, onRemoveImage }){
   const tr = useTr(), { tpls } = state, n = tpls.filter(t => t.pick).length;
   const idx = tpls.map((_, i) => i), mine = idx.filter(i => tpls[i].mine), defs = idx.filter(i => !tpls[i].mine);
-  const live = defs.filter(i => !state.archived.includes(tpls[i].key)), arch = defs.filter(i => !live.includes(i)), selectable = mine.length + live.length;
+  const live = defs.filter(i => !state.archived.includes(tpls[i].key)), arch = defs.filter(i => !live.includes(i));
+  // Selecionar todos / limpar seleção vale só para os templates da seção
+  const pickAll = items => {
+    const all = items.every(i => tpls[i].pick);
+    return <button className="btn ghost" onClick={() => actions.pickAll(items.map(i => tpls[i].key), !all)}>{tr(all ? 'grid.clearSelection' : 'grid.selectAll')}</button>;
+  };
   const shuffleAll = () => {
     if (!state.images.length){ toast(tr('shuffle.noStills')); return; }
     actions.shuffleAll(); toast(tr('grid.shuffled'));
@@ -55,10 +60,6 @@ export default function GridView({ state, actions, env, onEdit, onExport, onFile
         </div>
         <div className="block">
           <div className="block-head"><h2>{tr('exporting.title')}</h2><span className="note">{tr('exporting.note')}</span></div>
-          <div className="row">
-            <button className="btn ghost" disabled={!selectable} onClick={actions.toggleAll}>{tr(selectable && n === selectable ? 'grid.clearSelection' : 'grid.selectAll')}</button>
-            <span id="selCount">{n ? tr('grid.selected', { n }) : ''}</span>
-          </div>
           <div className="split">
             <div className="row">
               <span className="pair">
@@ -84,13 +85,16 @@ export default function GridView({ state, actions, env, onEdit, onExport, onFile
       <section className="lib">
         <div className="lib-head">
           <h2>{tr('grid.mine')}</h2>{mine.length > 0 && <span className="note">{tr('lib.count', { n: mine.length })}</span>}
-          <label className="btn" htmlFor="tplFile"><IconUpload />{tr('mine.import')}</label>
-          <input id="tplFile" type="file" accept=".json,application/json" multiple hidden onChange={e => { if (e.target.files.length) importFiles([...e.target.files]); e.target.value = ''; }} />
+          <span className="lib-act">
+            {mine.length > 0 && pickAll(mine)}
+            <label className="btn" htmlFor="tplFile"><IconUpload />{tr('mine.import')}</label>
+            <input id="tplFile" type="file" accept=".json,application/json" multiple hidden onChange={e => { if (e.target.files.length) importFiles([...e.target.files]); e.target.value = ''; }} />
+          </span>
         </div>
         {mine.length ? <TemplateGrid {...cardProps} items={mine} /> : <p className="note lib-empty">{tr('mine.empty')}</p>}
       </section>
       <section className="lib">
-        <div className="lib-head"><h2>{tr('grid.defaults')}</h2></div>
+        <div className="lib-head"><h2>{tr('grid.defaults')}</h2>{live.length > 0 && <span className="lib-act">{pickAll(live)}</span>}</div>
         {live.length ? <TemplateGrid {...cardProps} items={live} /> : <p className="note lib-empty">{tr('grid.allArchived')}</p>}
       </section>
       {arch.length > 0 && (
