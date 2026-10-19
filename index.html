@@ -1,6 +1,10 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Thumb Builder</title>
-<meta name="claude:viewport-fit-sides" content="cover">
+<style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gilda+Display&family=Hanken+Grotesk:wght@400;500;600&display=swap">
@@ -206,6 +210,8 @@ input[type=color]{width:34px;height:30px;border:1px solid var(--line);border-rad
 #toast.show{opacity:1;transform:translate(-50%,0)}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
+</head>
+<body>
 
 <header class="top"><div class="top-in gut">
   <div class="brand"><span class="mark">Thumb Builder</span><span class="tag">thumbnails a partir das suas stills</span></div>
@@ -1227,16 +1233,13 @@ $('#dlOne').addEventListener('click', () => exportTpls([E.i]));
 window.addEventListener('resize', () => { if (E.open){ sizeEd(); reqEd(); } });
 
 /* ---------------- Exportação ---------------- */
-let DL = null;
-async function getDL(){ if (DL) return DL; try { DL = window.claude && window.claude.use ? await window.claude.use('downloads') : null; } catch (e){ DL = null; } return DL; }
+function saveFile(name, blob){ const url = URL.createObjectURL(blob), a = document.createElement('a'); a.href = url; a.download = name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 60000); }
 const slug = s => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 const toBlob = (c, type, q) => new Promise(res => c.toBlob(res, type, q));
 let busy = false;
 async function exportTpls(idxs){
   if (busy) return; busy = true;
   try {
-    const dl = await getDL();
-    if (!dl){ toast('O download não está disponível nesta visualização. Abra a página no claude.ai para baixar.', 4500); return; }
     const W = S.size, H = Math.round(W * 9 / 16), png = S.fmt === 'png', type = png ? 'image/png' : 'image/jpeg', ext = png ? 'png' : 'jpg';
     toast(idxs.length > 1 ? `Preparando ${idxs.length} thumbnails em ${W}×${H}…` : `Preparando thumbnail em ${W}×${H}…`, 6000);
     const files = [];
@@ -1253,14 +1256,10 @@ async function exportTpls(idxs){
       const z = new JSZip(); files.forEach(f => z.file(f.name, f.blob));
       req = { filename: `thumbnails-${W}x${H}.zip`, data: await z.generateAsync({ type: 'blob' }) };
     }
-    await dl.save(req);
+    saveFile(req.filename, req.data);
     toast(files.length > 1 ? `${files.length} thumbnails salvas em um .zip.` : 'Thumbnail salva.');
   } catch (e){
-    const code = e && e.code;
-    if (code === 'declined') toast('Download cancelado.');
-    else if (code === 'rate_limited') toast('Já existe um download aguardando confirmação. Tente de novo em instantes.');
-    else if (code === 'too_large') toast('Arquivo grande demais. Tente um tamanho de exportação menor ou JPG.');
-    else toast('Não foi possível baixar agora. Tente de novo.');
+    toast('Não foi possível baixar agora. Tente um tamanho de exportação menor ou JPG.');
   } finally { busy = false; }
 }
 
@@ -1352,7 +1351,6 @@ renderTray(); renderFilterChips(); buildGrid(); updateSel();
 const firstFonts = needFonts(S.tpls.flatMap(t => t.texts));
 Promise.race([firstFonts || Promise.resolve(), new Promise(r => setTimeout(r, 2500))]).then(() => renderGrid());
 renderGrid();
-getDL();
 })();
 </script>
 
