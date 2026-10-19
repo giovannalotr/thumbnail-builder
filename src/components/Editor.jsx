@@ -1,7 +1,7 @@
 import { useEffect, useLayoutEffect, useReducer, useRef, useState } from 'react';
 import { needFonts } from '../lib/fonts.js';
 import { imgFor, renderTpl } from '../lib/render.js';
-import { makeTpl, slotGeo, slotRects } from '../lib/templates.js';
+import { makeTpl, slotGeo, slotRects, textAnchors } from '../lib/templates.js';
 import { toast } from '../lib/toast.js';
 import { BW, clamp, patchIn, setIn } from '../lib/util.js';
 import { shuffleTpl } from '../state.js';
@@ -11,6 +11,12 @@ import { IconDownload, IconRedo, IconShuffle, IconSwap, IconUndo } from './icons
 
 const TABS = [['imagens', 'Imagens'], ['textos', 'Textos'], ['bordas', 'Bordas']];
 const snap = t => JSON.stringify({ slots: t.slots, texts: t.texts, border: t.border });
+/* Âncora mais próxima de v dentro da tolerância: a posição dela e todas as linhas que passam por ali */
+function snapTo(list, v, tol){
+  let p = null;
+  for (const a of list) if (Math.abs(a.p - v) < tol && (p == null || Math.abs(a.p - v) < Math.abs(p - v))) p = a.p;
+  return p == null ? null : { p, lines: list.filter(a => Math.abs(a.p - p) < 1e-4) };
+}
 
 /* history = { undo, redo, last } e a aba ficam no App, então sobrevivem quando o editor fecha e abre de novo */
 export default function Editor({ index, tpl, images, env, actions, history, tab, setTab, prevBg, onPrevBg, onClose, onExport }){
@@ -94,7 +100,9 @@ export default function Editor({ index, tpl, images, env, actions, history, tab,
       }
       if (guide){
         x.save(); x.strokeStyle = 'rgba(214,120,90,.95)'; x.lineWidth = Math.max(1, 1.5 * s); x.beginPath();
-        if (guide.v){ x.moveTo(W / 2, 0); x.lineTo(W / 2, H); } if (guide.h){ x.moveTo(0, H / 2); x.lineTo(W, H / 2); } x.stroke(); x.restore();
+        (guide.v || []).forEach(l => { x.moveTo(l.p * W, l.a * H); x.lineTo(l.p * W, l.b * H); });
+        (guide.h || []).forEach(l => { x.moveTo(l.a * W, l.p * H); x.lineTo(l.b * W, l.p * H); });
+        x.stroke(); x.restore();
       }
     });
     return () => { alive = false; cancelAnimationFrame(id); };
@@ -135,8 +143,11 @@ export default function Editor({ index, tpl, images, env, actions, history, tab,
     const p = evPos(e), d = drag;
     if (!d){ setCursor(hitText(p) >= 0 ? 'move' : hitSlot(p) >= 0 ? 'grab' : 'default'); return; }
     if (d.type === 'text'){
-      const L = tpl.texts[d.i]; let nx = clamp(d.ox + p.x - d.sx, 0, 1), ny = clamp(d.oy + p.y - d.sy, 0, 1);
-      const g = {}; if (L.align === 'center' && Math.abs(nx - .5) < .012){ nx = .5; g.v = 1; } if (Math.abs(ny - .5) < .015){ ny = .5; g.h = 1; }
+      const L = tpl.texts[d.i], c = cvsRef.current, an = textAnchors(tpl, c.width, c.height);
+      let nx = clamp(d.ox + p.x - d.sx, 0, 1), ny = clamp(d.oy + p.y - d.sy, 0, 1);
+      // Gruda no centro da thumb ou de uma foto; o x só gruda em texto centralizado, porque nos outros ele marca a borda do texto
+      const g = {}, sv = L.align === 'center' && snapTo(an.v, nx, .012), sh = snapTo(an.h, ny, .015);
+      if (sv){ nx = sv.p; g.v = sv.lines; } if (sh){ ny = sh.p; g.h = sh.lines; }
       setGuide(g.v || g.h ? g : null);
       edit(t => patchIn(t, `texts.${d.i}`, { x: nx, y: ny }));
     } else {

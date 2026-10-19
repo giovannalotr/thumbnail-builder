@@ -67,6 +67,16 @@ function lay(n, x, y, w, h, g, out){
 }
 export const blendOn = t => t.border.blend > 0 && t.slots.length > 1;
 export function slotRects(t, W, H){ const s = W / BW, bl = blendOn(t), o = bl ? 0 : t.border.outer * s, out = []; lay(t.def.layout, o, o, W - 2 * o, H - 2 * o, bl ? 0 : t.border.gap * s, out); return out; }
+/* Âncoras para centralizar textos, em frações do canvas: o centro da thumb inteira e o centro de cada foto.
+   v são linhas verticais (p é o x), h são horizontais (p é o y); a e b dão a extensão da linha. */
+export function textAnchors(t, W, H){
+  const v = [{ p: .5, a: 0, b: 1 }], h = [{ p: .5, a: 0, b: 1 }];
+  slotRects(t, W, H).forEach(r => {
+    v.push({ p: (r.x + r.w / 2) / W, a: r.y / H, b: (r.y + r.h) / H });
+    h.push({ p: (r.y + r.h / 2) / H, a: r.x / W, b: (r.x + r.w) / W });
+  });
+  return { v, h };
+}
 /* Geometria de desenho: com transição suave, cada foto avança metade da suavidade sobre as vizinhas */
 export function slotGeo(t, W, H){
   const rs = slotRects(t, W, H);
