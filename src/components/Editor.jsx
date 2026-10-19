@@ -260,7 +260,7 @@ export default function Editor({ index, tpl, images, env, actions, history, tab,
           <button className="icon-btn" title={tr('editor.undoTitle')} aria-label={tr('editor.undo')} disabled={!history.undo.length} onClick={undo}><IconUndo /></button>
           <button className="icon-btn" title={tr('editor.redoTitle')} aria-label={tr('editor.redo')} disabled={!history.redo.length} onClick={redo}><IconRedo /></button>
           <button className="btn" onClick={shuffle}><IconShuffle />{tr('editor.shuffle')}</button>
-          <button className="btn ghost" disabled={tpl.mine && !dirty} onClick={reset}>{tr(tpl.mine ? (armed ? 'editor.revertConfirm' : 'editor.revert') : (armed ? 'editor.resetConfirm' : 'editor.reset'))}</button>
+          <button className={'btn ghost' + (armed ? ' danger' : '')} disabled={tpl.mine && !dirty} onClick={reset}>{tr(tpl.mine ? (armed ? 'editor.revertConfirm' : 'editor.revert') : (armed ? 'editor.resetConfirm' : 'editor.reset'))}</button>
           <div className="save-wrap" ref={saveRef}>
             <button className="btn" disabled={tpl.mine && !dirty} title={tr(tpl.mine ? 'editor.saveTitleMine' : 'editor.saveTitleDefault')} onClick={save}><IconSave />{tr('editor.save')}</button>
             {saveName != null && (
