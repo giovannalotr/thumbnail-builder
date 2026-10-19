@@ -13,3 +13,4 @@ export const IconSun = () => <svg {...P}><circle cx="12" cy="12" r="4" /><path d
 export const IconMoon = () => <svg {...PJ}><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z" /></svg>;
 export const IconCheck = () => <svg {...PJ}><path d="m5 12.5 4.5 4.5L19 7.5" /></svg>;
 export const IconSwap = () => <svg {...PJ}><path d="M4 8h15M15 4l4 4-4 4M20 16H5M9 12l-4 4 4 4" /></svg>;
+export const IconChevron = () => <svg {...PJ}><path d="m6 9 6 6 6-6" /></svg>;

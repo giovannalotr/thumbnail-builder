@@ -1,6 +1,7 @@
 import { useEffect, useLayoutEffect, useReducer, useRef, useState } from 'react';
 import { needFonts } from '../lib/fonts.js';
 import { imgFor, renderTpl } from '../lib/render.js';
+import { cancel, schedule } from '../lib/scheduler.js';
 import { makeTpl, slotGeo, slotRects, textAnchors, tplName } from '../lib/templates.js';
 import { toast } from '../lib/toast.js';
 import { isDirty, revertMine } from '../lib/userTemplates.js';
@@ -9,7 +10,7 @@ import { shuffleTpl, useTr } from '../state.js';
 import { BordersPanel, ImagesPanel, TextsPanel } from './EditorPanels.jsx';
 import PreviewBgPicker from './PreviewBgPicker.jsx';
 import { useDismiss } from './controls.jsx';
-import { IconDownload, IconRedo, IconSave, IconShuffle, IconSwap, IconUndo } from './icons.jsx';
+import { IconChevron, IconDownload, IconRedo, IconSave, IconShuffle, IconSwap, IconUndo } from './icons.jsx';
 
 const TABS = ['imagens', 'textos', 'bordas'];
 const snap = t => JSON.stringify({ slots: t.slots, texts: t.texts, border: t.border });
@@ -47,6 +48,7 @@ function readSnaps(){
   try { const o = JSON.parse(localStorage.getItem('tb-anchors') || '{}'); return { photo: o.photo !== false, text: o.text !== false }; } catch (e){ return { photo: true, text: true }; }
 }
 const NO_LINES = { v: [], h: [] };
+function readMini(){ try { return localStorage.getItem('tb-mini') !== '0'; } catch (e){ return true; } }
 
 /* history = { undo, redo, last } e a aba ficam no App, então sobrevivem quando o editor fecha e abre de novo.
    onSaveAs(nome) guarda uma cópia de um template padrão em "Meus templates". */
@@ -64,8 +66,10 @@ export default function Editor({ index, tpl, images, env, actions, history, tab,
   const [swap, setSwap] = useState(null);
   const [saveName, setSaveName] = useState(null);
   const [snaps, setSnaps] = useState(readSnaps);
+  const [mini, setMini] = useState(readMini);
+  const [mw, setMw] = useState(0);
   const [, bump] = useReducer(n => n + 1, 0);
-  const wrapRef = useRef(null), cvsRef = useRef(null), pbRef = useRef(null);
+  const wrapRef = useRef(null), cvsRef = useRef(null), pbRef = useRef(null), miniRef = useRef(null);
   const boxesRef = useRef([]), swapRef = useRef(null), armRef = useRef(0), wheelRef = useRef(null), revealSlot = useRef(false), saveRef = useRef(null);
   const dirty = isDirty(tpl);
   useDismiss(saveRef, saveName != null, () => setSaveName(null));
@@ -144,6 +148,20 @@ export default function Editor({ index, tpl, images, env, actions, history, tab,
     });
     return () => { alive = false; cancelAnimationFrame(id); };
   }, [tpl, index, env, cw, tab, slotSel, textSel, drag, guide, fontTick]);
+  // Pré-visualização reduzida (como a thumb aparece no YouTube): sem seleção nem guias, desenhada depois do palco
+  useEffect(() => {
+    const c = miniRef.current; if (!c) return;
+    const size = () => setMw(Math.round(c.clientWidth * (window.devicePixelRatio || 1)));
+    size();
+    const ro = new ResizeObserver(size); ro.observe(c);
+    return () => ro.disconnect();
+  }, [mini]);
+  useEffect(() => {
+    if (!mini || !mw) return;
+    schedule('mini', () => { if (miniRef.current) renderTpl(tpl, index, mw, Math.round(mw * 9 / 16), env, { canvas: miniRef.current }); });
+    return () => cancel('mini');
+  }, [mini, mw, tpl, index, env, fontTick]);
+  useEffect(() => { try { localStorage.setItem('tb-mini', mini ? '1' : '0'); } catch (e){} }, [mini]);
   // Quando um clique na foto troca a seleção, mostra o cartão dela no painel
   useEffect(() => {
     if (!revealSlot.current) return;
@@ -338,6 +356,12 @@ export default function Editor({ index, tpl, images, env, actions, history, tab,
           </div>
         </div>
         <aside className="panel">
+          <div className="mini-prev">
+            <button className="mini-head" aria-expanded={mini} onClick={() => setMini(v => !v)}>
+              <span>{tr('editor.mini')}</span><span className="note">{tr('editor.miniNote')}</span><IconChevron />
+            </button>
+            {mini && <canvas ref={miniRef} aria-label={tr('editor.mini')} />}
+          </div>
           <nav className="tabs" role="tablist">
             {TABS.map(id => <button key={id} className={'tab' + (tab === id ? ' on' : '')} role="tab" aria-selected={tab === id} onClick={() => { setTab(id); setFontOpen(false); }}>{tr('editor.tab.' + id)}</button>)}
           </nav>

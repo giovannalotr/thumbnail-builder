@@ -159,6 +159,8 @@ export default {
   'editor.swapHelp': 'Drag the icon onto another photo to swap them.',
   'editor.blendAll': 'Soft transition applied to all templates.',
   'editor.bordersAll': 'Borders applied to all templates.',
+  'editor.mini': 'Small preview',
+  'editor.miniNote': 'as it shows on YouTube',
   'editor.anchors': 'Snap when moving texts to:',
   'editor.anchors.photo': 'thumbnail and photo centers',
   'editor.anchors.text': 'other texts',

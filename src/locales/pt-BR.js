@@ -160,6 +160,8 @@ export default {
   'editor.swapHelp': 'Arraste o ícone até outra foto para trocá-las de lugar.',
   'editor.blendAll': 'Transição suave aplicada a todos os templates.',
   'editor.bordersAll': 'Bordas aplicadas a todos os templates.',
+  'editor.mini': 'Prévia reduzida',
+  'editor.miniNote': 'como fica no YouTube',
   'editor.anchors': 'Âncoras ao mover textos:',
   'editor.anchors.photo': 'centro da thumb e das fotos',
   'editor.anchors.text': 'outros textos',
