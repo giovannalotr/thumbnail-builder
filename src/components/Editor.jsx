@@ -19,6 +19,28 @@ function snapTo(list, v, tol){
   for (const a of list) if (Math.abs(a.p - v) < tol && (p == null || Math.abs(a.p - v) < Math.abs(p - v))) p = a.p;
   return p == null ? null : { p, lines: list.filter(a => Math.abs(a.p - p) < 1e-4) };
 }
+/* Âncoras dos outros textos (t: true), em frações do canvas: bordas esquerda e direita e o meio, na vertical;
+   bordas superior e inferior e o meio, na horizontal */
+function textEdges(boxes, skip){
+  const v = [], h = [];
+  boxes.forEach((bb, k) => {
+    if (!bb || k === skip) return;
+    [bb.x, bb.x + bb.w / 2, bb.x + bb.w].forEach(p => v.push({ p, a: bb.y, b: bb.y + bb.h, t: true }));
+    [bb.y, bb.y + bb.h / 2, bb.y + bb.h].forEach(p => h.push({ p, a: bb.x, b: bb.x + bb.w, t: true }));
+  });
+  return { v, h };
+}
+/* Encaixe num eixo. pos é a posição do texto (x ou y) e feats a distância dela até as duas bordas e o meio da caixa.
+   As âncoras das fotos pegam só o meio do texto; as dos outros textos pegam qualquer borda ou o meio. */
+function snapAxis(pos, feats, photo, text, tol){
+  let best = null;
+  const test = (list, fs) => fs.forEach(f => {
+    const r = snapTo(list, pos + f, tol), d = r && Math.abs(r.p - pos - f);
+    if (r && (!best || d < best.d)) best = { d, pos: r.p - f, lines: r.lines };
+  });
+  test(photo, [feats[1]]); test(text, feats);
+  return best;
+}
 
 /* history = { undo, redo, last } e a aba ficam no App, então sobrevivem quando o editor fecha e abre de novo.
    onSaveAs(nome) guarda uma cópia de um template padrão em "Meus templates". */
@@ -151,12 +173,17 @@ export default function Editor({ index, tpl, images, env, actions, history, tab,
     const p = evPos(e), d = drag;
     if (!d){ setCursor(hitText(p) >= 0 ? 'move' : hitSlot(p) >= 0 ? 'grab' : 'default'); return; }
     if (d.type === 'text'){
-      const L = tpl.texts[d.i], c = cvsRef.current, an = textAnchors(tpl, c.width, c.height);
+      const L = tpl.texts[d.i], c = cvsRef.current, an = textAnchors(tpl, c.width, c.height), te = textEdges(boxesRef.current, d.i), bb = boxesRef.current[d.i];
       let nx = clamp(d.ox + p.x - d.sx, 0, 1), ny = clamp(d.oy + p.y - d.sy, 0, 1);
-      // Gruda no centro da thumb ou de uma foto; o x só gruda em texto centralizado, porque nos outros ele marca a borda do texto
-      const g = {}, sv = L.align === 'center' && snapTo(an.v, nx, .012), sh = snapTo(an.h, ny, .015);
-      if (sv){ nx = sv.p; g.v = sv.lines; } if (sh){ ny = sh.p; g.h = sh.lines; }
-      setGuide(g.v || g.h ? g : null);
+      // x marca a borda esquerda, o meio ou a borda direita da caixa, conforme o alinhamento; y é sempre o meio
+      const off = L.align === 'center' ? bb.w / 2 : L.align === 'left' ? 0 : bb.w;
+      const sv = snapAxis(nx, [-off, bb.w / 2 - off, bb.w - off], an.v, te.v, .012), sh = snapAxis(ny, [-bb.h / 2, 0, bb.h / 2], an.h, te.h, .015);
+      if (sv) nx = sv.pos; if (sh) ny = sh.pos;
+      // As linhas de um texto vão até o texto arrastado, para mostrar com o que ele está alinhado
+      const x0 = nx - off, y0 = ny - bb.h / 2, g = {};
+      if (sv) g.v = sv.lines.map(l => l.t ? { ...l, a: Math.min(l.a, y0), b: Math.max(l.b, y0 + bb.h) } : l);
+      if (sh) g.h = sh.lines.map(l => l.t ? { ...l, a: Math.min(l.a, x0), b: Math.max(l.b, x0 + bb.w) } : l);
+      setGuide(sv || sh ? g : null);
       edit(t => patchIn(t, `texts.${d.i}`, { x: nx, y: ny }));
     } else {
       const c = cvsRef.current, r = slotGeo(tpl, c.width, c.height)[d.i].e, im = imgFor(tpl, d.i, images, index); if (!im) return;
