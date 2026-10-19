@@ -47,6 +47,13 @@ export default function GridView({ state, actions, env, onEdit, onExport, onFile
         <Stills images={state.images} onFiles={onFiles} onRemove={onRemoveImage} />
         <ColorFilter state={state} actions={actions} />
         <div className="block">
+          <div className="block-head"><h2>{tr('preview.title')}</h2><span className="note">{tr('preview.note')}</span></div>
+          <div className="split">
+            <PreviewBgPicker value={state.prevBg} onChange={v => actions.set('prevBg', v)} />
+            <button className="btn" onClick={shuffleAll}><IconShuffle />{tr('grid.shuffle')}</button>
+          </div>
+        </div>
+        <div className="block">
           <div className="block-head"><h2>{tr('exporting.title')}</h2><span className="note">{tr('exporting.note')}</span></div>
           <div className="row">
             <button className="btn ghost" disabled={!selectable} onClick={actions.toggleAll}>{tr(selectable && n === selectable ? 'grid.clearSelection' : 'grid.selectAll')}</button>
@@ -71,13 +78,6 @@ export default function GridView({ state, actions, env, onEdit, onExport, onFile
             <button className="btn primary" disabled={!n} onClick={() => onExport(tpls.map((t, i) => t.pick ? i : -1).filter(i => i >= 0))}>
               <IconDownload />{n > 1 ? tr('grid.downloadN', { n }) : tr('grid.download')}
             </button>
-          </div>
-        </div>
-        <div className="block">
-          <div className="block-head"><h2>{tr('preview.title')}</h2><span className="note">{tr('preview.note')}</span></div>
-          <div className="split">
-            <PreviewBgPicker value={state.prevBg} onChange={v => actions.set('prevBg', v)} />
-            <button className="btn" onClick={shuffleAll}><IconShuffle />{tr('grid.shuffle')}</button>
           </div>
         </div>
       </section>
