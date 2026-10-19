@@ -6,11 +6,13 @@ const PREV_BGS = [['auto', null], ['branco', '#FFFFFF'], ['claro', '#CFCCC7'], [
 /* Pinta o fundo da grade e do palco do editor; v é um id de PREV_BGS ou uma cor #rrggbb */
 export function applyPrevBg(v){
   const hex = v.startsWith('#') ? v : (PREV_BGS.find(b => b[0] === v) || PREV_BGS[0])[1], root = document.documentElement.style;
-  if (!hex){ ['--stage', '--stage-ink', '--stage-fg'].forEach(k => root.removeProperty(k)); return; }
+  if (!hex){ ['--stage', '--stage-ink', '--stage-fg', '--stage-line'].forEach(k => root.removeProperty(k)); return; }
   const [r, g, b] = hex2rgb(hex), light = (.299 * r + .587 * g + .114 * b) / 255 > .55;
   root.setProperty('--stage', hex);
   root.setProperty('--stage-ink', light ? 'rgba(30,26,22,.68)' : 'rgba(245,240,232,.72)');
   root.setProperty('--stage-fg', light ? '#2A2521' : '#F2ECE2');
+  // Linha de sombra sob as thumbs: com a cor da borda do tema ela fica clara demais sobre fundo escuro
+  root.setProperty('--stage-line', light ? 'rgba(40,30,20,.16)' : 'rgba(0,0,0,.45)');
 }
 
 export default function PreviewBgPicker({ value, onChange }){

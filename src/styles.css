@@ -8,7 +8,7 @@
   --f-display:"Gilda Display", Georgia, "Times New Roman", serif;
   --f-brand:"Cormorant Garamond", Georgia, "Times New Roman", serif;
   --f-ui:"Hanken Grotesk", "Segoe UI", system-ui, sans-serif;
-  --r:8px; --stage:transparent; --stage-ink:var(--muted); --stage-fg:var(--ink);
+  --r:8px; --stage:transparent; --stage-ink:var(--muted); --stage-fg:var(--ink); --stage-line:var(--line);
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
   --bg:#191714; --panel:#221F1B; --raise:#2A2621; --ink:#EDE7DD; --muted:#A39A8E; --line:#3A352F;
@@ -91,7 +91,7 @@ h2{font-family:var(--f-display);font-weight:400;font-size:21px;margin:0}
 
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(320px,100%),1fr));gap:28px 22px}
 .card{display:flex;flex-direction:column;gap:10px;min-width:0}
-.thumb{position:relative;border:0;padding:0;background:var(--soft);border-radius:var(--r);overflow:hidden;aspect-ratio:16/9;width:100%;max-width:100%;display:block;box-shadow:0 1px 0 var(--line);transition:transform .2s,box-shadow .2s}
+.thumb{position:relative;border:0;padding:0;background:var(--soft);border-radius:var(--r);overflow:hidden;aspect-ratio:16/9;width:100%;max-width:100%;display:block;box-shadow:0 1px 0 var(--stage-line);transition:transform .2s,box-shadow .2s}
 .thumb:hover{transform:translateY(-2px);box-shadow:0 10px 24px -14px rgba(40,30,20,.55)}
 .thumb canvas{width:100%;height:100%;display:block}
 .thumb .edited{position:absolute;top:8px;left:8px;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;background:rgba(246,243,238,.92);color:#2A2521;padding:3px 8px;border-radius:999px}
