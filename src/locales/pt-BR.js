@@ -224,10 +224,10 @@ export default {
   'texts.glassColor': 'Cor do vidro',
   'texts.colorOpacity': 'Opacidade da cor',
   'texts.frost': 'Fosco (desfoque)',
-  'texts.bandWidth': 'Largura (faixa)',
   'texts.extraWidth': 'Largura extra',
-  'texts.bandHeight': 'Altura (faixa)',
   'texts.extraHeight': 'Altura extra',
+  'texts.boxX': 'Deslocamento horizontal',
+  'texts.boxY': 'Deslocamento vertical',
   'texts.corners': 'Cantos',
   'texts.outline': 'Contorno fino',
 

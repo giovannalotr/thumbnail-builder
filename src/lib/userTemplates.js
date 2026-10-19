@@ -14,7 +14,7 @@ const VERSION = 1, STORE = 'tb-mine';
 const SLOT = { zoom: [1, 4], px: [-1, 1], py: [-1, 1] };
 const TEXT = { weight: [100, 900], size: [12, 320], ls: [-.05, .5], lh: [.6, 1.8], x: [0, 1], y: [0, 1] };
 const SHADOW = { blur: [0, 80], ox: [-30, 30], oy: [-30, 30], op: [0, 1] };
-const BOX = { op: [0, 1], blur: [0, 40], px: [0, 200], py: [0, 140], r: [0, 60] };
+const BOX = { op: [0, 1], blur: [0, 40], px: [0, 200], py: [0, 140], ox: [-200, 200], oy: [-150, 150], r: [0, 60] };
 const BORDER = { outer: [0, 90], gap: [0, 60], radius: [0, 48], amt: [0, 1], blend: [0, 360] };
 const ENUM = { align: ['left', 'center', 'right'], mode: ['none', 'box', 'band-h', 'band-v'], tex: TEXTURES };
 const HEX = /^#([0-9a-f]{3}|[0-9a-f]{6})$/i;

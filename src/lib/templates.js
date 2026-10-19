@@ -50,7 +50,7 @@ export function makeText(o){
   const d = { text: '', font: 'Cormorant Garamond', weight: 400, italic: false, size: 80, color: '#F6EEDD', ls: 0, lh: 1.05, align: 'center', x: .5, y: .5 };
   return Object.assign(d, o, {
     shadow: Object.assign({ on: true, color: '#1E1610', blur: 18, ox: 0, oy: 2, op: .45 }, o.shadow || {}),
-    box: Object.assign({ mode: 'none', color: '#1E1A16', op: .25, blur: 12, px: 28, py: 12, r: 6, line: false }, o.box || {}),
+    box: Object.assign({ mode: 'none', color: '#1E1A16', op: .25, blur: 12, px: 28, py: 12, ox: 0, oy: 0, r: 6, line: false }, o.box || {}),
   });
 }
 export const makeBorder = o => Object.assign({ outer: 0, gap: 0, radius: 0, color: '#EDE6D6', tex: 'grao', amt: .55, blend: 0 }, o);

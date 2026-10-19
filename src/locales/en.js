@@ -223,10 +223,10 @@ export default {
   'texts.glassColor': 'Glass color',
   'texts.colorOpacity': 'Color opacity',
   'texts.frost': 'Frost (blur)',
-  'texts.bandWidth': 'Width (band)',
   'texts.extraWidth': 'Extra width',
-  'texts.bandHeight': 'Height (band)',
   'texts.extraHeight': 'Extra height',
+  'texts.boxX': 'Horizontal offset',
+  'texts.boxY': 'Vertical offset',
   'texts.corners': 'Corners',
   'texts.outline': 'Thin outline',
 

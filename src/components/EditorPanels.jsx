@@ -162,7 +162,11 @@ export function TextsPanel({ tpl, textSel, setTextSel, fontOpen, setFontOpen, ed
         <div className="sub" aria-disabled={bm === 'none'}>
           <div className="field"><label>{tr('texts.glassColor')}</label><Swatches value={L.box.color} colors={BOX_COLORS} onChange={v => setPath(p + '.box.color', v)} /></div>
           <div className="two">{R(tr('texts.colorOpacity'), p + '.box.op', 0, 1, .01, 'pct')}{R(tr('texts.frost'), p + '.box.blur', 0, 40, 1, 'px')}</div>
-          <div className="two">{R(tr(bm === 'band-h' ? 'texts.bandWidth' : 'texts.extraWidth'), p + '.box.px', 0, 200, 1, 'px')}{R(tr(bm === 'band-v' ? 'texts.bandHeight' : 'texts.extraHeight'), p + '.box.py', 0, 140, 1, 'px')}</div>
+          {/* A faixa horizontal vai de um lado ao outro (sem largura nem posição x); a vertical, do topo à base (sem altura nem posição y) */}
+          {bm === 'box' && <div className="two">{R(tr('texts.extraWidth'), p + '.box.px', 0, 200, 1, 'px')}{R(tr('texts.extraHeight'), p + '.box.py', 0, 140, 1, 'px')}</div>}
+          {bm === 'box' && <div className="two">{R(tr('texts.boxX'), p + '.box.ox', -200, 200, 1, 'px')}{R(tr('texts.boxY'), p + '.box.oy', -150, 150, 1, 'px')}</div>}
+          {bm === 'band-h' && <div className="two">{R(tr('texts.extraHeight'), p + '.box.py', 0, 140, 1, 'px')}{R(tr('texts.boxY'), p + '.box.oy', -150, 150, 1, 'px')}</div>}
+          {bm === 'band-v' && <div className="two">{R(tr('texts.extraWidth'), p + '.box.px', 0, 200, 1, 'px')}{R(tr('texts.boxX'), p + '.box.ox', -200, 200, 1, 'px')}</div>}
           {bm === 'box' && R(tr('texts.corners'), p + '.box.r', 0, 60, 1, 'px')}
           <label className="tog"><input type="checkbox" checked={L.box.line} onChange={e => setPath(p + '.box.line', e.target.checked)} /> {tr('texts.outline')}</label>
         </div>

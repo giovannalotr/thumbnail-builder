@@ -58,7 +58,8 @@ function drawText(ctx, canvas, L, s, W, H, blurs){
   const left = L.align === 'center' ? cx - maxW / 2 : L.align === 'left' ? cx : cx - maxW, top = cy - blockH / 2;
   const Bx = L.box;
   if (Bx.mode !== 'none'){
-    let bx = left - Bx.px * s, by = top - Bx.py * s, bw = maxW + 2 * Bx.px * s, bh = blockH + 2 * Bx.py * s;
+    // ox e oy deslocam a caixa em relação ao texto; a faixa horizontal só usa oy, e a vertical só ox
+    let bx = left - Bx.px * s + Bx.ox * s, by = top - Bx.py * s + Bx.oy * s, bw = maxW + 2 * Bx.px * s, bh = blockH + 2 * Bx.py * s;
     if (Bx.mode === 'band-h'){ bx = 0; bw = W; }
     if (Bx.mode === 'band-v'){ by = 0; bh = H; }
     const rad = Bx.mode === 'box' ? Bx.r * s : 0;
