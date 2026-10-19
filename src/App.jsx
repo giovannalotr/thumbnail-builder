@@ -7,6 +7,7 @@ import Toast from './components/Toast.jsx';
 import { exportTpls } from './lib/exporter.js';
 import { makeGrade } from './lib/grade.js';
 import { decodeImages, isImageFile } from './lib/images.js';
+import { imgFor } from './lib/render.js';
 import { loadSamples } from './lib/samples.js';
 import { toast } from './lib/toast.js';
 import { editedStore, makeMine, mineStore, writeEdited, writeMine } from './lib/userTemplates.js';
@@ -100,9 +101,12 @@ export default function App(){
     if (history.state && history.state.tb === 'edit') history.back();
     else { history.replaceState(null, '', gridUrl()); setEditing(null); }
   };
-  // Salvar um template padrão cria uma cópia em "Meus templates", e o editor passa a editar a cópia
+  // Salvar um template padrão cria uma cópia em "Meus templates", e o editor passa a editar a cópia.
+  // Espaço sem imagem escolhida mostra uma que depende da posição do template na lista; a cópia fica
+  // em outra posição, então guarda explicitamente as imagens que estavam na tela
   const saveAs = name => {
-    const t = state.tpls[ei], m = makeMine({ name, base: t.def.id, slots: t.slots, texts: t.texts, border: t.border });
+    const t = state.tpls[ei], slots = t.slots.map((sl, si) => ({ ...sl, img: (imgFor(t, si, images, ei) || {}).id || null }));
+    const m = makeMine({ name, base: t.def.id, slots, texts: t.texts, border: t.border });
     actions.addTemplates([m]); history.replaceState(history.state, '', editHash(m.key)); setEditing(m.key);
   };
 
