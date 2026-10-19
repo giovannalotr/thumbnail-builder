@@ -23,7 +23,7 @@ export default function App(){
   const [edTab, setEdTab] = useState('imagens');
   const [dropping, setDropping] = useState(false);
   const [histories] = useState(() => state.tpls.map(() => ({ undo: [], redo: [], last: null })));
-  const { images, imgVer, filter, amt, grain, vig, prevBg } = state;
+  const { images, imgVer, filter, amt, grain, vig, prevBg, archived } = state;
   const grade = useMemo(() => makeGrade(filter, amt, grain, vig), [filter, amt, grain, vig]);
   const env = useMemo(() => ({ images, imgVer, grade }), [images, imgVer, grade]);
   // A grade redesenha os 12 templates; espera o controle deslizante parar por 90 ms
@@ -34,6 +34,7 @@ export default function App(){
     applyPrevBg(prevBg);
     try { localStorage.setItem('tb-prevbg', prevBg); } catch (e){}
   }, [prevBg]);
+  useEffect(() => { try { localStorage.setItem('tb-archived', JSON.stringify(archived)); } catch (e){} }, [archived]);
 
   const loadFiles = useCallback(async files => {
     const list = [...files].filter(isImageFile);

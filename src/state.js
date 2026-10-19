@@ -5,11 +5,15 @@ import { sampleImages } from './lib/samples.js';
 import { DEFS, makeTpl } from './lib/templates.js';
 
 function readPrevBg(){ try { return localStorage.getItem('tb-prevbg') || 'auto'; } catch (e){ return 'auto'; } }
+function readArchived(){
+  try { const v = JSON.parse(localStorage.getItem('tb-archived') || '[]'); return Array.isArray(v) ? v.filter(id => DEFS.some(d => d.id === id)) : []; } catch (e){ return []; }
+}
 const initialState = () => ({
   images: sampleImages(), imgVer: 0, filter: 'natural', amt: 1, grain: 0, vig: 0, size: 1920, fmt: 'jpg',
-  prevBg: readPrevBg(), tpls: DEFS.map(makeTpl),
+  prevBg: readPrevBg(), tpls: DEFS.map(makeTpl), archived: readArchived(), showArchived: false,
 });
 const replaceAt = (a, i, v) => a.map((x, k) => k === i ? v : x);
+const isArchived = (s, t) => s.archived.includes(t.def.id);
 const clearSlots = (tpls, test) => tpls.map(t => t.slots.some(test) ? { ...t, slots: t.slots.map(sl => test(sl) ? { ...sl, img: null } : sl) } : t);
 
 function shuffled(a){ a = a.slice(); for (let i = a.length - 1; i > 0; i--){ const j = Math.random() * (i + 1) | 0; [a[i], a[j]] = [a[j], a[i]]; } return a; }
@@ -28,7 +32,9 @@ export function shuffleTpl(t, ti, images){
 }
 
 /* Estado do app inteiro. Toda mudança gera objetos novos, então os componentes
-   comparam slots, textos e bordas por referência para saber o que redesenhar. */
+   comparam slots, textos e bordas por referência para saber o que redesenhar.
+   archived guarda os ids dos templates arquivados; as ações em lote (selecionar todos,
+   embaralhar, aplicar bordas) não mexem neles. */
 export function useStore(){
   const [state, setState] = useState(initialState);
   const actions = useMemo(() => ({
@@ -43,9 +49,18 @@ export function useStore(){
     setTpl: (i, fn) => setState(s => ({ ...s, tpls: replaceAt(s.tpls, i, fn(s.tpls[i])) })),
     editTpl: (i, fn) => setState(s => ({ ...s, tpls: replaceAt(s.tpls, i, { ...fn(s.tpls[i]), edited: true }) })),
     setPick: (i, pick) => setState(s => ({ ...s, tpls: replaceAt(s.tpls, i, { ...s.tpls[i], pick }) })),
-    toggleAll: () => setState(s => { const all = s.tpls.every(t => t.pick); return { ...s, tpls: s.tpls.map(t => ({ ...t, pick: !all })) }; }),
-    shuffleAll: () => setState(s => ({ ...s, tpls: s.tpls.map((t, ti) => shuffleTpl(t, ti, s.images)) })),
-    borderAll: i => setState(s => ({ ...s, tpls: s.tpls.map((t, k) => k === i ? t : { ...t, border: { ...s.tpls[i].border }, edited: true }) })),
+    toggleAll: () => setState(s => {
+      const all = s.tpls.every(t => t.pick || isArchived(s, t));
+      return { ...s, tpls: s.tpls.map(t => isArchived(s, t) ? t : { ...t, pick: !all }) };
+    }),
+    shuffleAll: () => setState(s => ({ ...s, tpls: s.tpls.map((t, ti) => isArchived(s, t) ? t : shuffleTpl(t, ti, s.images)) })),
+    borderAll: i => setState(s => ({ ...s, tpls: s.tpls.map((t, k) => k === i || isArchived(s, t) ? t : { ...t, border: { ...s.tpls[i].border }, edited: true }) })),
+    // Template arquivado sai da seleção, para não entrar no "Baixar selecionados"
+    archive: (i, on) => setState(s => {
+      const t = s.tpls[i], archived = s.archived.filter(id => id !== t.def.id);
+      if (on) archived.push(t.def.id);
+      return { ...s, archived, tpls: on && t.pick ? replaceAt(s.tpls, i, { ...t, pick: false }) : s.tpls };
+    }),
   }), []);
   return [state, actions];
 }

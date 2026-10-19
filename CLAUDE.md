@@ -62,7 +62,8 @@ Code comments are in Brazilian Portuguese. UI text lives in `src/locales/` (see 
 
 ### State and redraws
 
-- `state.js` holds one immutable state object; `actions` is stable. `editTpl` marks the template as edited, `setTpl` does not. Use `setIn` / `patchIn` from `util.js` with dotted paths such as `texts.0.shadow.blur`.
+- `state.js` holds one immutable state object; `actions` is stable. `archived` lists the ids of archived templates (saved in localStorage `tb-archived`); bulk actions (select all, shuffle, apply borders to all) skip them, and archiving unselects the template. A template's index (`ti`) is always its position in the full `tpls` list, never in a filtered one.
+- `editTpl` marks the template as edited, `setTpl` does not. Use `setIn` / `patchIn` from `util.js` with dotted paths such as `texts.0.shadow.blur`.
 - Canvas effects depend on the identities of `slots`, `texts` and `border`, so updates must create new objects or nothing redraws.
 - Grid cards draw through `lib/scheduler.js` (one job per macrotask; scheduling the same key replaces a pending job), and the grid uses a 90 ms debounced grade so slider drags stay responsive.
 
