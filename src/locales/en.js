@@ -31,7 +31,6 @@ export default {
   'scene.janela': 'window',
 
   'filter.title': 'Color filter',
-  'filter.note': 'applies to all templates',
   'filter.amount': 'Intensity',
   'filter.grain': 'Film grain',
   'filter.vignette': 'Vignette',
@@ -47,10 +46,8 @@ export default {
   'filters.sepia': 'Soft sepia',
 
   'exporting.title': 'Export',
-  'exporting.note': 'downloads the selected templates',
   'exporting.size': 'Size',
   'preview.title': 'Preview',
-  'preview.note': 'applies to all templates',
   'grid.selectAll': 'Select all',
   'grid.clearSelection': 'Clear selection',
   'grid.format': 'Format',

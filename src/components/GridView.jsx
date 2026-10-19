@@ -52,14 +52,14 @@ export default function GridView({ state, actions, env, loading, onEdit, onExpor
         <Stills images={state.images} loading={loading} onFiles={onFiles} onRemove={onRemoveImage} />
         <ColorFilter state={state} actions={actions} />
         <div className="block">
-          <div className="block-head"><h2>{tr('preview.title')}</h2><span className="note">{tr('preview.note')}</span></div>
+          <div className="block-head"><h2>{tr('preview.title')}</h2></div>
           <div className="split">
             <PreviewBgPicker value={state.prevBg} onChange={v => actions.set('prevBg', v)} />
             <button className="btn" onClick={shuffleAll}><IconShuffle />{tr('grid.shuffle')}</button>
           </div>
         </div>
         <div className="block">
-          <div className="block-head"><h2>{tr('exporting.title')}</h2><span className="note">{tr('exporting.note')}</span></div>
+          <div className="block-head"><h2>{tr('exporting.title')}</h2></div>
           <div className="split">
             <div className="row">
               <span className="pair">

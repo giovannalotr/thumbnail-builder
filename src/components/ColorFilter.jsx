@@ -24,7 +24,7 @@ export default function ColorFilter({ state, actions }){
   const tr = useTr(), src = state.images[0];
   return (
     <div className="block">
-      <div className="block-head"><h2>{tr('filter.title')}</h2><span className="note">{tr('filter.note')}</span></div>
+      <div className="block-head"><h2>{tr('filter.title')}</h2></div>
       <div className="filters" role="radiogroup" aria-label={tr('filter.title')}>
         {FILTERS.map(f => <FilterChip key={f.id} filter={f} src={src} on={f.id === state.filter} onPick={() => actions.set('filter', f.id)} />)}
       </div>

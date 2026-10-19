@@ -32,7 +32,6 @@ export default {
   'scene.janela': 'janela',
 
   'filter.title': 'Filtro de cor',
-  'filter.note': 'vale para todos os templates',
   'filter.amount': 'Intensidade',
   'filter.grain': 'Grão de filme',
   'filter.vignette': 'Vinheta',
@@ -48,10 +47,8 @@ export default {
   'filters.sepia': 'Sépia suave',
 
   'exporting.title': 'Exportação',
-  'exporting.note': 'baixa os templates selecionados',
   'exporting.size': 'Tamanho',
   'preview.title': 'Pré-visualização',
-  'preview.note': 'vale para todos os templates',
   'grid.selectAll': 'Selecionar todos',
   'grid.clearSelection': 'Limpar seleção',
   'grid.format': 'Formato',
