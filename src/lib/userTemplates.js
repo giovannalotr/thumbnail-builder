@@ -101,3 +101,17 @@ export function readMine(){
 /* Conteúdo do localStorage para os templates salvos de tpls: nome atual e a última versão salva */
 export const mineStore = tpls => JSON.stringify(tpls.filter(t => t.mine).map(t => ({ key: t.key, name: t.name, base: t.def.id, ...JSON.parse(t.saved) })));
 export function writeMine(json){ try { localStorage.setItem(STORE, json); } catch (e){} }
+
+/* Edições dos templates padrão feitas sem salvar como meu template: ficam no localStorage, sem as stills,
+   para continuar depois de recarregar a página. Restaurar o template no editor tira edited e apaga a edição. */
+const EDITED = 'tb-edited';
+export function readEdited(){
+  let o;
+  try { o = JSON.parse(localStorage.getItem(EDITED) || '{}'); } catch (e){ return {}; }
+  const out = {};
+  if (!o || typeof o !== 'object' || Array.isArray(o)) return out;
+  for (const [id, d] of Object.entries(o)){ try { out[id] = readTemplate({ ...d, base: id }); } catch (e){} }
+  return out;
+}
+export const editedStore = tpls => JSON.stringify(Object.fromEntries(tpls.filter(t => !t.mine && t.edited).map(t => [t.key, tplData(t)])));
+export function writeEdited(json){ try { localStorage.setItem(EDITED, json); } catch (e){} }

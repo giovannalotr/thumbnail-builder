@@ -2,15 +2,23 @@ import { useMemo, useState, useSyncExternalStore } from 'react';
 import { getLang, onLang, tr } from './lib/i18n.js';
 import { imgFor } from './lib/render.js';
 import { DEFS, makeTpl } from './lib/templates.js';
-import { readMine, saveMine } from './lib/userTemplates.js';
+import { readEdited, readMine, saveMine } from './lib/userTemplates.js';
 
 function readPrevBg(){ try { return localStorage.getItem('tb-prevbg') || 'auto'; } catch (e){ return 'auto'; } }
 function readArchived(){
   try { const v = JSON.parse(localStorage.getItem('tb-archived') || '[]'); return Array.isArray(v) ? v.filter(id => DEFS.some(d => d.id === id)) : []; } catch (e){ return []; }
 }
+/* Templates padrão com as edições guardadas da última visita */
+function readDefaults(){
+  const edits = readEdited();
+  return DEFS.map(d => {
+    const t = makeTpl(d), e = edits[d.id];
+    return e ? { ...t, slots: e.slots.map(s => ({ img: null, ...s })), texts: e.texts, border: e.border, edited: true } : t;
+  });
+}
 const initialState = () => ({
   images: [], imgVer: 0, filter: 'natural', amt: 1, grain: 0, vig: 0, size: 1920, fmt: 'jpg',
-  prevBg: readPrevBg(), tpls: [...DEFS.map(makeTpl), ...readMine()], archived: readArchived(), showArchived: false,
+  prevBg: readPrevBg(), tpls: [...readDefaults(), ...readMine()], archived: readArchived(), showArchived: false,
 });
 const replaceAt = (a, i, v) => a.map((x, k) => k === i ? v : x);
 const isArchived = (s, t) => s.archived.includes(t.key);

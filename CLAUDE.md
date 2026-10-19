@@ -73,7 +73,7 @@ The six sample stills are Unsplash photos in `src/assets/samples/` (credits in t
 ### State and redraws
 
 - `state.js` holds one immutable state object; `actions` is stable. `tpls` holds the 12 defaults followed by the saved templates. `archived` lists the keys of archived default templates (saved in localStorage `tb-archived`); bulk actions (shuffle, apply borders to all) skip them, archiving unselects the template, and "select all" exists per grid section (My templates, defaults), never for the archived one. A template's index (`ti`) is always its position in the full `tpls` list, never in a filtered one.
-- `editTpl` marks the template as edited, `setTpl` does not. Use `setIn` / `patchIn` from `util.js` with dotted paths such as `texts.0.shadow.blur`.
+- `editTpl` marks the template as edited, `setTpl` does not. Edited default templates are kept in localStorage `tb-edited` (`{ [id]: { slots, texts, border } }`, without stills, read back through `readTemplate`), so edits survive a reload; resetting a template in the editor clears `edited` and drops its entry. Use `setIn` / `patchIn` from `util.js` with dotted paths such as `texts.0.shadow.blur`.
 - Canvas effects depend on the identities of `slots`, `texts` and `border`, so updates must create new objects or nothing redraws.
 - Grid cards draw through `lib/scheduler.js` (one job per macrotask; scheduling the same key replaces a pending job), and the grid uses a 90 ms debounced grade so slider drags stay responsive.
 

@@ -9,7 +9,7 @@ import { makeGrade } from './lib/grade.js';
 import { decodeImages, isImageFile } from './lib/images.js';
 import { loadSamples } from './lib/samples.js';
 import { toast } from './lib/toast.js';
-import { makeMine, mineStore, writeMine } from './lib/userTemplates.js';
+import { editedStore, makeMine, mineStore, writeEdited, writeMine } from './lib/userTemplates.js';
 import { useStore, useTr } from './state.js';
 
 function useDebounced(value, ms){
@@ -41,6 +41,8 @@ export default function App(){
   useEffect(() => { loadSamples().then(actions.addSamples); }, [actions]);
   const mineJson = useMemo(() => mineStore(state.tpls), [state.tpls]);
   useEffect(() => writeMine(mineJson), [mineJson]);
+  const editedJson = useMemo(() => editedStore(state.tpls), [state.tpls]);
+  useEffect(() => writeEdited(editedJson), [editedJson]);
 
   const loadFiles = useCallback(async files => {
     const list = [...files].filter(isImageFile);
