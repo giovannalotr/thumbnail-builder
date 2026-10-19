@@ -79,6 +79,7 @@ The six sample stills are Unsplash photos in `src/assets/samples/` (credits in t
 
 ### Editor (`src/components/Editor.jsx`)
 
+- Routing is hash-based so it works on GitHub Pages: `#/edit/<key>` opens the editor, no hash shows the grid. Opening pushes a history entry and closing goes back to it, so the browser's back button returns to the grid; an unknown key falls back to the grid.
 - `App` tracks the open template by `key` and mounts the editor with `key={key}`; the active tab and the per-template undo history (by key) live in `App`, so they survive closing and reopening the editor.
 - Dragging a text snaps it (`snapAxis`): the text's middle snaps to the centers of the thumbnail and of each photo (`textAnchors`), and its edges or middle snap to the edges and middles of the other texts (`textEdges`, from the render `boxes`). Checkboxes under the canvas turn each kind off (saved as `tb-anchors`).
 - History stores JSON snapshots of `{ slots, texts, border }`, committed after 350 ms without changes and never during a drag.

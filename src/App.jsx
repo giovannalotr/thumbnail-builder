@@ -13,6 +13,10 @@ import { editedStore, makeMine, mineStore, writeEdited, writeMine } from './lib/
 import { useStore, useTr } from './state.js';
 
 let loadSeq = 0;
+/* Rota no hash (funciona no GitHub Pages sem configurar o servidor): #/edit/<key> abre o editor; sem hash, a grade */
+const routeKey = () => { const m = /^#\/edit\/(.+)$/.exec(location.hash); return m ? decodeURIComponent(m[1]) : null; };
+const editHash = key => '#/edit/' + encodeURIComponent(key);
+const gridUrl = () => location.pathname + location.search;
 
 function useDebounced(value, ms){
   const [v, setV] = useState(value);
@@ -24,7 +28,7 @@ export default function App(){
   const [state, actions] = useStore();
   const tr = useTr();
   // editing é a key do template aberto no editor; o histórico de desfazer fica guardado por key
-  const [editing, setEditing] = useState(null);
+  const [editing, setEditing] = useState(routeKey);
   const [edTab, setEdTab] = useState('imagens');
   const [dropping, setDropping] = useState(false);
   // Stills ainda decodificando ({ id, name }): a faixa de stills mostra um esqueleto para cada uma
@@ -82,19 +86,33 @@ export default function App(){
   const onExport = idxs => exportTpls(idxs, { tpls: state.tpls, size: state.size, fmt: state.fmt, env });
   const setPrevBg = v => actions.set('prevBg', v);
   const ei = editing == null ? -1 : state.tpls.findIndex(t => t.key === editing);
+  // Voltar e avançar do navegador trocam entre a grade e o editor
+  useEffect(() => {
+    const onPop = () => setEditing(routeKey());
+    window.addEventListener('popstate', onPop);
+    return () => window.removeEventListener('popstate', onPop);
+  }, []);
+  // Endereço de um template que não existe (apagado, ou de outro navegador) cai na grade
+  useEffect(() => { if (editing != null && ei < 0){ history.replaceState(null, '', gridUrl()); setEditing(null); } }, [editing, ei]);
+  // Abrir o editor cria uma entrada no histórico; fechar volta a ela, para o voltar do navegador não sair do app
+  const openEditor = key => { history.pushState({ tb: 'edit' }, '', editHash(key)); setEditing(key); };
+  const closeEditor = () => {
+    if (history.state && history.state.tb === 'edit') history.back();
+    else { history.replaceState(null, '', gridUrl()); setEditing(null); }
+  };
   // Salvar um template padrão cria uma cópia em "Meus templates", e o editor passa a editar a cópia
   const saveAs = name => {
     const t = state.tpls[ei], m = makeMine({ name, base: t.def.id, slots: t.slots, texts: t.texts, border: t.border });
-    actions.addTemplates([m]); setEditing(m.key);
+    actions.addTemplates([m]); history.replaceState(history.state, '', editHash(m.key)); setEditing(m.key);
   };
 
   return (
     <>
       <Header />
       {ei < 0
-        ? <GridView state={state} actions={actions} env={gridEnv} onEdit={i => setEditing(state.tpls[i].key)} onExport={onExport} loading={loading} onFiles={loadFiles} onRemoveImage={removeImage} />
+        ? <GridView state={state} actions={actions} env={gridEnv} onEdit={i => openEditor(state.tpls[i].key)} onExport={onExport} loading={loading} onFiles={loadFiles} onRemoveImage={removeImage} />
         : <Editor key={editing} index={ei} tpl={state.tpls[ei]} images={images} env={env} actions={actions} history={histories[editing] || (histories[editing] = { undo: [], redo: [], last: null })}
-            tab={edTab} setTab={setEdTab} prevBg={prevBg} onPrevBg={setPrevBg} onClose={() => setEditing(null)} onExport={onExport} onSaveAs={saveAs} />}
+            tab={edTab} setTab={setEdTab} prevBg={prevBg} onPrevBg={setPrevBg} onClose={closeEditor} onExport={onExport} onSaveAs={saveAs} />}
       <div id="drop" hidden={!dropping}>{tr('files.drop')}</div>
       <Toast />
     </>
