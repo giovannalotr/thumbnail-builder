@@ -1,6 +1,6 @@
 # Thumbnail Builder
 
-Monta thumbnails de vídeo a partir de stills: 12 templates, filtros de cor, textos e bordas editáveis, exportação em JPG ou PNG.
+Monta thumbnails de vídeo a partir das suas imagens: 12 templates, filtros de cor, textos e bordas editáveis, exportação em JPG ou PNG.
 Tudo roda no navegador; nenhuma imagem é enviada para servidor.
 
 ## Desenvolvimento
@@ -29,7 +29,7 @@ O build usa caminhos relativos (`base: './'` em `vite.config.js`), então funcio
 - `src/state.js`: estado do app e as ações que o alteram.
 - `src/locales/`: textos da interface em português do Brasil e em inglês; `src/lib/i18n.js` escolhe o idioma (na primeira visita, o do dispositivo; depois, o que a pessoa escolheu).
 - `src/components/`: interface em React. `GridView` é a tela inicial; `Editor` e `EditorPanels` formam o editor de um template.
-- `src/assets/samples/`: as fotos de exemplo que aparecem antes de a pessoa enviar as próprias stills.
+- `src/assets/samples/`: as fotos de exemplo que aparecem antes de a pessoa enviar as próprias imagens.
 - `public/`: favicons (`favicon.svg`, `favicon.ico` e `apple-touch-icon.png`), copiados sem alteração para o build.
 
 ## Fotos de exemplo
