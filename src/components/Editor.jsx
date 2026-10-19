@@ -358,7 +358,7 @@ export default function Editor({ index, tpl, images, env, actions, history, tab,
         <aside className="panel">
           <div className="mini-prev">
             <button className="mini-head" aria-expanded={mini} onClick={() => setMini(v => !v)}>
-              <span>{tr('editor.mini')}</span><span className="note">{tr('editor.miniNote')}</span><IconChevron />
+              <span>{tr('editor.mini')}</span><IconChevron />
             </button>
             {mini && <canvas ref={miniRef} aria-label={tr('editor.mini')} />}
           </div>
