@@ -12,7 +12,7 @@ import { IconDownload, IconShuffle, IconUpload } from './icons.jsx';
 
 const SIZES = [1280, 1920, 2560, 3840];
 
-export default function GridView({ state, actions, env, onEdit, onExport, onFiles, onRemoveImage }){
+export default function GridView({ state, actions, env, loading, onEdit, onExport, onFiles, onRemoveImage }){
   const tr = useTr(), { tpls } = state, n = tpls.filter(t => t.pick).length;
   const idx = tpls.map((_, i) => i), mine = idx.filter(i => tpls[i].mine), defs = idx.filter(i => !tpls[i].mine);
   const live = defs.filter(i => !state.archived.includes(tpls[i].key)), arch = defs.filter(i => !live.includes(i));
@@ -49,7 +49,7 @@ export default function GridView({ state, actions, env, onEdit, onExport, onFile
   return (
     <main id="gridView" className="gut">
       <section className="deck">
-        <Stills images={state.images} onFiles={onFiles} onRemove={onRemoveImage} />
+        <Stills images={state.images} loading={loading} onFiles={onFiles} onRemove={onRemoveImage} />
         <ColorFilter state={state} actions={actions} />
         <div className="block">
           <div className="block-head"><h2>{tr('preview.title')}</h2><span className="note">{tr('preview.note')}</span></div>

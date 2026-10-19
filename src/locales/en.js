@@ -21,6 +21,7 @@ export default {
   'stills.remove': 'Remove {name}',
   'stills.add': '+ add\nstills',
   'stills.sample': 'Sample · {name}',
+  'stills.loadingOne': 'Loading {name}',
   'stills.credit': 'photo by {author} on Unsplash',
   'scene.colinas': 'hills',
   'scene.bosque': 'woods',

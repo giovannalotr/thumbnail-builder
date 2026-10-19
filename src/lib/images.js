@@ -8,13 +8,15 @@ export function makePreview(img, w, h, max = 1600){
 
 let uid = 0;
 export const isImageFile = f => /^image\//.test(f.type) || /\.(jpe?g|png|webp|avif|gif|bmp)$/i.test(f.name);
-export async function decodeImages(files){
+/* Decodifica uma a uma; onEach(k, imagem ou null) avisa assim que o arquivo k termina, para a interface mostrar o progresso */
+export async function decodeImages(files, onEach = () => {}){
   const added = [], failed = [];
-  for (const f of files){
+  for (const [k, f] of files.entries()){
     const url = URL.createObjectURL(f), img = new Image(); img.src = url;
-    try { await img.decode(); } catch (e){ failed.push(f.name); URL.revokeObjectURL(url); continue; }
+    try { await img.decode(); } catch (e){ failed.push(f.name); URL.revokeObjectURL(url); onEach(k, null); continue; }
     const w = img.naturalWidth, h = img.naturalHeight;
-    added.push({ id: 'u' + (++uid), name: f.name, w, h, src: img, prev: makePreview(img, w, h), thumb: thumbURL(img, w, h), url });
+    const im = { id: 'u' + (++uid), name: f.name, w, h, src: img, prev: makePreview(img, w, h), thumb: thumbURL(img, w, h), url };
+    added.push(im); onEach(k, im);
   }
   return { added, failed };
 }

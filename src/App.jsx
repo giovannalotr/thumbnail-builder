@@ -12,6 +12,8 @@ import { toast } from './lib/toast.js';
 import { editedStore, makeMine, mineStore, writeEdited, writeMine } from './lib/userTemplates.js';
 import { useStore, useTr } from './state.js';
 
+let loadSeq = 0;
+
 function useDebounced(value, ms){
   const [v, setV] = useState(value);
   useEffect(() => { const t = setTimeout(() => setV(value), ms); return () => clearTimeout(t); }, [value, ms]);
@@ -25,6 +27,8 @@ export default function App(){
   const [editing, setEditing] = useState(null);
   const [edTab, setEdTab] = useState('imagens');
   const [dropping, setDropping] = useState(false);
+  // Stills ainda decodificando ({ id, name }): a faixa de stills mostra um esqueleto para cada uma
+  const [loading, setLoading] = useState([]);
   const histories = useRef({}).current;
   const { images, imgVer, filter, amt, grain, vig, prevBg, archived } = state;
   const grade = useMemo(() => makeGrade(filter, amt, grain, vig), [filter, amt, grain, vig]);
@@ -48,9 +52,14 @@ export default function App(){
     const list = [...files].filter(isImageFile);
     if (!list.length){ toast(tr('files.none')); return; }
     toast(tr('files.loading', { n: list.length }), 1600);
-    const { added, failed } = await decodeImages(list);
+    const pending = list.map(f => ({ id: 'load' + (++loadSeq), name: f.name }));
+    setLoading(l => [...l, ...pending]);
+    // Cada still entra no app assim que fica pronta
+    const { added, failed } = await decodeImages(list, (k, im) => {
+      setLoading(l => l.filter(x => x !== pending[k]));
+      if (im) actions.addImages([im]);
+    });
     if (!added.length){ toast(tr('files.failedAll')); return; }
-    actions.addImages(added);
     if (failed.length) toast(tr('files.failedSome', { names: failed.join(', ') }), 4200);
   }, [actions]);
 
@@ -83,7 +92,7 @@ export default function App(){
     <>
       <Header />
       {ei < 0
-        ? <GridView state={state} actions={actions} env={gridEnv} onEdit={i => setEditing(state.tpls[i].key)} onExport={onExport} onFiles={loadFiles} onRemoveImage={removeImage} />
+        ? <GridView state={state} actions={actions} env={gridEnv} onEdit={i => setEditing(state.tpls[i].key)} onExport={onExport} loading={loading} onFiles={loadFiles} onRemoveImage={removeImage} />
         : <Editor key={editing} index={ei} tpl={state.tpls[ei]} images={images} env={env} actions={actions} history={histories[editing] || (histories[editing] = { undo: [], redo: [], last: null })}
             tab={edTab} setTab={setEdTab} prevBg={prevBg} onPrevBg={setPrevBg} onClose={() => setEditing(null)} onExport={onExport} onSaveAs={saveAs} />}
       <div id="drop" hidden={!dropping}>{tr('files.drop')}</div>
