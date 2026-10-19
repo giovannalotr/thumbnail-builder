@@ -5,7 +5,17 @@ import ptBR from '../locales/pt-BR.js';
    componentes (que usam useTr, em state.js, para redesenhar na troca) quanto para módulos sem React. */
 export const LANGS = [{ id: 'pt-BR', short: 'PT', name: 'Português (Brasil)' }, { id: 'en', short: 'EN', name: 'English' }];
 const DICTS = { 'pt-BR': ptBR, en };
-function readLang(){ try { const v = localStorage.getItem('tb-lang'); return DICTS[v] ? v : 'pt-BR'; } catch (e){ return 'pt-BR'; } }
+/* Sem escolha salva, usa o primeiro idioma do dispositivo que o app tem (qualquer português vira pt-BR);
+   se nenhum servir, inglês */
+function deviceLang(){
+  for (const v of navigator.languages || [navigator.language]){
+    const base = String(v).toLowerCase().split('-')[0];
+    if (base === 'pt') return 'pt-BR';
+    if (base === 'en') return 'en';
+  }
+  return 'en';
+}
+function readLang(){ try { const v = localStorage.getItem('tb-lang'); return DICTS[v] ? v : deviceLang(); } catch (e){ return deviceLang(); } }
 let lang = readLang(), plurals = new Intl.PluralRules(lang);
 document.documentElement.lang = lang;
 const listeners = new Set();

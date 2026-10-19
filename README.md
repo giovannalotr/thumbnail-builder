@@ -27,7 +27,7 @@ O build usa caminhos relativos (`base: './'` em `vite.config.js`), então funcio
 
 - `src/lib/`: desenho em canvas, sem React. Templates e layouts (`templates.js`), "Meus templates" e o arquivo .json (`userTemplates.js`), filtros de cor (`grade.js`), texturas, fontes, fotos de exemplo (`samples.js`), renderização (`render.js`) e exportação (`exporter.js`).
 - `src/state.js`: estado do app e as ações que o alteram.
-- `src/locales/`: textos da interface em português do Brasil (padrão) e em inglês; `src/lib/i18n.js` escolhe o idioma.
+- `src/locales/`: textos da interface em português do Brasil e em inglês; `src/lib/i18n.js` escolhe o idioma (na primeira visita, o do dispositivo; depois, o que a pessoa escolheu).
 - `src/components/`: interface em React. `GridView` é a tela inicial; `Editor` e `EditorPanels` formam o editor de um template.
 - `src/assets/samples/`: as fotos de exemplo que aparecem antes de a pessoa enviar as próprias stills.
 - `public/`: favicons (`favicon.svg`, `favicon.ico` e `apple-touch-icon.png`), copiados sem alteração para o build.

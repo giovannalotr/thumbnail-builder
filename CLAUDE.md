@@ -57,7 +57,7 @@ Code comments are in Brazilian Portuguese. UI text lives in `src/locales/` (see 
 
 ### Internationalization (`src/lib/i18n.js`, `src/locales/`)
 
-- `pt-BR.js` (the default) and `en.js` are flat dictionaries with the same keys. The chosen language is saved in localStorage (`tb-lang`) and set on `<html lang>`.
+- `pt-BR.js` (the fallback for missing keys) and `en.js` are flat dictionaries with the same keys. The chosen language is saved in localStorage (`tb-lang`) and set on `<html lang>`. Without a saved choice, the first entry of `navigator.languages` that the app supports is used (any `pt-*` maps to pt-BR), falling back to English.
 - `tr(key, params)` reads the current language at call time, so `src/lib` modules (toasts, export file names) call it directly. Components get it from `useTr()` in `state.js`, which re-renders them when the language changes; call it in every component that shows text.
 - `{name}` placeholders come from `params`. With `params.n`, `key_one` / `key_other` is chosen by `Intl.PluralRules` (pt-BR treats 0 as singular).
 - Lists in `src/lib` (`FILTERS`, `TEXTURES`, `FCATS`, `DEFS`) hold ids only; display names are the keys `filters.<id>`, `texture.<id>`, `fontCat.<id>` and `tpl.<id>` (`tplName(t)`). Sample stills are named with `imgName(im)`.
