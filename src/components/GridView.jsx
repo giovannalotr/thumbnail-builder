@@ -46,48 +46,57 @@ export default function GridView({ state, actions, env, onEdit, onExport, onFile
       <section className="deck">
         <Stills images={state.images} onFiles={onFiles} onRemove={onRemoveImage} />
         <ColorFilter state={state} actions={actions} />
-      </section>
-
-      <section className="bar">
-        <div className="bar-l">
-          <h2>{tr('grid.title')}</h2>
-          <button className="btn ghost" disabled={!selectable} onClick={actions.toggleAll}>{tr(selectable && n === selectable ? 'grid.clearSelection' : 'grid.selectAll')}</button>
-          <span id="selCount">{n ? tr('grid.selected', { n }) : ''}</span>
+        <div className="block">
+          <div className="block-head"><h2>{tr('exporting.title')}</h2><span className="note">{tr('exporting.note')}</span></div>
+          <div className="row">
+            <button className="btn ghost" disabled={!selectable} onClick={actions.toggleAll}>{tr(selectable && n === selectable ? 'grid.clearSelection' : 'grid.selectAll')}</button>
+            <span id="selCount">{n ? tr('grid.selected', { n }) : ''}</span>
+          </div>
+          <div className="split">
+            <div className="row">
+              <span className="pair">
+                <label className="note" htmlFor="expSize">{tr('exporting.size')}</label>
+                <select id="expSize" className="sel" value={state.size} onChange={e => actions.set('size', +e.target.value)}>
+                  {SIZES.map(w => <option key={w} value={w}>{w} × {w * 9 / 16}</option>)}
+                </select>
+              </span>
+              <span className="pair">
+                <label className="note" htmlFor="expFmt">{tr('grid.format')}</label>
+                <select id="expFmt" className="sel" value={state.fmt} onChange={e => actions.set('fmt', e.target.value)}>
+                  <option value="jpg">JPG</option>
+                  <option value="png">PNG</option>
+                </select>
+              </span>
+            </div>
+            <button className="btn primary" disabled={!n} onClick={() => onExport(tpls.map((t, i) => t.pick ? i : -1).filter(i => i >= 0))}>
+              <IconDownload />{n > 1 ? tr('grid.downloadN', { n }) : tr('grid.download')}
+            </button>
+          </div>
         </div>
-        <div className="bar-r">
-          <label className="note" htmlFor="expSize">{tr('grid.export')}</label>
-          <select id="expSize" className="sel" value={state.size} onChange={e => actions.set('size', +e.target.value)}>
-            {SIZES.map(w => <option key={w} value={w}>{w} × {w * 9 / 16}</option>)}
-          </select>
-          <select className="sel" aria-label={tr('grid.format')} value={state.fmt} onChange={e => actions.set('fmt', e.target.value)}>
-            <option value="jpg">JPG</option>
-            <option value="png">PNG</option>
-          </select>
-          <button className="btn primary" disabled={!n} onClick={() => onExport(tpls.map((t, i) => t.pick ? i : -1).filter(i => i >= 0))}>
-            <IconDownload />{n > 1 ? tr('grid.downloadN', { n }) : tr('grid.download')}
-          </button>
+        <div className="block">
+          <div className="block-head"><h2>{tr('preview.title')}</h2><span className="note">{tr('preview.note')}</span></div>
+          <div className="split">
+            <PreviewBgPicker value={state.prevBg} onChange={v => actions.set('prevBg', v)} />
+            <button className="btn" onClick={shuffleAll}><IconShuffle />{tr('grid.shuffle')}</button>
+          </div>
         </div>
       </section>
-      <div className="tools">
-        <PreviewBgPicker value={state.prevBg} onChange={v => actions.set('prevBg', v)} />
-        <button className="btn" onClick={shuffleAll}><IconShuffle />{tr('grid.shuffle')}</button>
-      </div>
       <section className="lib">
         <div className="lib-head">
-          <h3>{tr('grid.mine')}</h3>{mine.length > 0 && <span className="note">{tr('lib.count', { n: mine.length })}</span>}
+          <h2>{tr('grid.mine')}</h2>{mine.length > 0 && <span className="note">{tr('lib.count', { n: mine.length })}</span>}
           <label className="btn" htmlFor="tplFile"><IconUpload />{tr('mine.import')}</label>
           <input id="tplFile" type="file" accept=".json,application/json" multiple hidden onChange={e => { if (e.target.files.length) importFiles([...e.target.files]); e.target.value = ''; }} />
         </div>
         {mine.length ? <TemplateGrid {...cardProps} items={mine} /> : <p className="note lib-empty">{tr('mine.empty')}</p>}
       </section>
       <section className="lib">
-        <div className="lib-head"><h3>{tr('grid.defaults')}</h3></div>
+        <div className="lib-head"><h2>{tr('grid.defaults')}</h2></div>
         {live.length ? <TemplateGrid {...cardProps} items={live} /> : <p className="note lib-empty">{tr('grid.allArchived')}</p>}
       </section>
       {arch.length > 0 && (
         <section className="lib">
           <div className="lib-head">
-            <h3>{tr('archived.title')}</h3><span className="note">{tr('lib.count', { n: arch.length })}</span>
+            <h2>{tr('archived.title')}</h2><span className="note">{tr('lib.count', { n: arch.length })}</span>
             <button className="btn ghost" aria-expanded={state.showArchived} onClick={() => actions.set('showArchived', !state.showArchived)}>{tr(state.showArchived ? 'archived.hide' : 'archived.show')}</button>
           </div>
           {state.showArchived && <TemplateGrid {...cardProps} items={arch} archived />}
