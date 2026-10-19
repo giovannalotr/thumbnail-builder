@@ -21,7 +21,7 @@ Commit messages are always in English and follow Conventional Commits (`feat:`, 
 
 ## Deployment
 
-`.github/workflows/deploy.yml` builds and publishes `dist/` to GitHub Pages on every push to `main` (the repository's Pages source must be "GitHub Actions"). `base: './'` in `vite.config.js` keeps asset paths relative so the same build works under `/<repo>/` and on a custom domain; keep it relative.
+`.github/workflows/deploy.yml` builds and publishes `dist/` to GitHub Pages on every push to `main` (the repository's Pages source must be "GitHub Actions"). `base: './'` in `vite.config.js` keeps asset paths relative so the same build works under `/<repo>/` and on a custom domain; keep it relative. Files in `public/` (the favicons) are copied as-is; `index.html` links them as `/favicon.svg` and the build rewrites that to `./favicon.svg`. `favicon.ico` (16/32/48) and `apple-touch-icon.png` (180, square corners) are PNG renders of `favicon.svg`; regenerate them when it changes.
 
 ## Architecture
 
