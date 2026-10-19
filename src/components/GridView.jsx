@@ -16,10 +16,10 @@ export default function GridView({ state, actions, env, loading, onEdit, onExpor
   const tr = useTr(), { tpls } = state, n = tpls.filter(t => t.pick).length;
   const idx = tpls.map((_, i) => i), mine = idx.filter(i => tpls[i].mine), defs = idx.filter(i => !tpls[i].mine);
   const live = defs.filter(i => !state.archived.includes(tpls[i].key)), arch = defs.filter(i => !live.includes(i));
-  // Selecionar todos / limpar seleção vale só para os templates da seção
+  // Vale só para os templates da seção: com algum selecionado, o botão limpa a seleção; sem nenhum, seleciona todos
   const pickAll = items => {
-    const all = items.every(i => tpls[i].pick);
-    return <button className="btn ghost" onClick={() => actions.pickAll(items.map(i => tpls[i].key), !all)}>{tr(all ? 'grid.clearSelection' : 'grid.selectAll')}</button>;
+    const any = items.some(i => tpls[i].pick);
+    return <button className="btn ghost" onClick={() => actions.pickAll(items.map(i => tpls[i].key), !any)}>{tr(any ? 'grid.clearSelection' : 'grid.selectAll')}</button>;
   };
   const shuffleAll = () => {
     if (!state.images.length){ toast(tr('shuffle.noStills')); return; }
