@@ -163,6 +163,9 @@ export default {
   'editor.swapHelp': 'Arraste o ícone até outra foto para trocá-las de lugar.',
   'editor.blendAll': 'Transição suave aplicada a todos os templates.',
   'editor.bordersAll': 'Bordas aplicadas a todos os templates.',
+  'editor.anchors': 'Âncoras ao mover textos:',
+  'editor.anchors.photo': 'centro da thumb e das fotos',
+  'editor.anchors.text': 'outros textos',
   'editor.hint': 'Arraste uma foto para reposicionar · role sobre ela para zoom · arraste um texto para movê-lo · arraste o ícone ⇄ de uma foto até outra para trocá-las de lugar',
 
   'images.empty': 'Envie stills para preencher este template.',

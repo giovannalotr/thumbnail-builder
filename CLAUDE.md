@@ -80,7 +80,7 @@ The six sample stills are Unsplash photos in `src/assets/samples/` (credits in t
 ### Editor (`src/components/Editor.jsx`)
 
 - `App` tracks the open template by `key` and mounts the editor with `key={key}`; the active tab and the per-template undo history (by key) live in `App`, so they survive closing and reopening the editor.
-- Dragging a text snaps it (`snapAxis`): the text's middle snaps to the centers of the thumbnail and of each photo (`textAnchors`), and its edges or middle snap to the edges and middles of the other texts (`textEdges`, from the render `boxes`).
+- Dragging a text snaps it (`snapAxis`): the text's middle snaps to the centers of the thumbnail and of each photo (`textAnchors`), and its edges or middle snap to the edges and middles of the other texts (`textEdges`, from the render `boxes`). Checkboxes under the canvas turn each kind off (saved as `tb-anchors`).
 - History stores JSON snapshots of `{ slots, texts, border }`, committed after 350 ms without changes and never during a drag.
 - The wheel (zoom) listener is attached manually as non-passive because React registers `onWheel` as passive.
 - Photo-swap drag state is kept in a ref, since `pointerup` can arrive before the last `pointermove` re-render.

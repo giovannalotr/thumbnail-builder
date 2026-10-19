@@ -162,6 +162,9 @@ export default {
   'editor.swapHelp': 'Drag the icon onto another photo to swap them.',
   'editor.blendAll': 'Soft transition applied to all templates.',
   'editor.bordersAll': 'Borders applied to all templates.',
+  'editor.anchors': 'Snap when moving texts to:',
+  'editor.anchors.photo': 'thumbnail and photo centers',
+  'editor.anchors.text': 'other texts',
   'editor.hint': 'Drag a photo to reposition it · scroll over it to zoom · drag a text to move it · drag a photo’s ⇄ icon onto another photo to swap them',
 
   'images.empty': 'Upload stills to fill this template.',

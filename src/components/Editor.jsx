@@ -42,6 +42,12 @@ function snapAxis(pos, feats, photo, text, tol){
   return best;
 }
 
+/* Quais âncoras o texto arrastado usa (fotos e outros textos); a escolha fica salva no navegador */
+function readSnaps(){
+  try { const o = JSON.parse(localStorage.getItem('tb-anchors') || '{}'); return { photo: o.photo !== false, text: o.text !== false }; } catch (e){ return { photo: true, text: true }; }
+}
+const NO_LINES = { v: [], h: [] };
+
 /* history = { undo, redo, last } e a aba ficam no App, então sobrevivem quando o editor fecha e abre de novo.
    onSaveAs(nome) guarda uma cópia de um template padrão em "Meus templates". */
 export default function Editor({ index, tpl, images, env, actions, history, tab, setTab, prevBg, onPrevBg, onClose, onExport, onSaveAs }){
@@ -57,6 +63,7 @@ export default function Editor({ index, tpl, images, env, actions, history, tab,
   const [armed, setArmed] = useState(false);
   const [swap, setSwap] = useState(null);
   const [saveName, setSaveName] = useState(null);
+  const [snaps, setSnaps] = useState(readSnaps);
   const [, bump] = useReducer(n => n + 1, 0);
   const wrapRef = useRef(null), cvsRef = useRef(null), pbRef = useRef(null);
   const boxesRef = useRef([]), swapRef = useRef(null), armRef = useRef(0), wheelRef = useRef(null), revealSlot = useRef(false), saveRef = useRef(null);
@@ -173,7 +180,7 @@ export default function Editor({ index, tpl, images, env, actions, history, tab,
     const p = evPos(e), d = drag;
     if (!d){ setCursor(hitText(p) >= 0 ? 'move' : hitSlot(p) >= 0 ? 'grab' : 'default'); return; }
     if (d.type === 'text'){
-      const L = tpl.texts[d.i], c = cvsRef.current, an = textAnchors(tpl, c.width, c.height), te = textEdges(boxesRef.current, d.i), bb = boxesRef.current[d.i];
+      const L = tpl.texts[d.i], c = cvsRef.current, an = snaps.photo ? textAnchors(tpl, c.width, c.height) : NO_LINES, te = snaps.text ? textEdges(boxesRef.current, d.i) : NO_LINES, bb = boxesRef.current[d.i];
       let nx = clamp(d.ox + p.x - d.sx, 0, 1), ny = clamp(d.oy + p.y - d.sy, 0, 1);
       // x marca a borda esquerda, o meio ou a borda direita da caixa, conforme o alinhamento; y é sempre o meio
       const off = L.align === 'center' ? bb.w / 2 : L.align === 'left' ? 0 : bb.w;
@@ -260,6 +267,7 @@ export default function Editor({ index, tpl, images, env, actions, history, tab,
     commit(tpl); onSaveAs(saveName.trim() || tr('mine.untitled')); toast(tr('editor.savedNew'), 4000);
   }
   useEffect(() => () => clearTimeout(armRef.current), []);
+  useEffect(() => { try { localStorage.setItem('tb-anchors', JSON.stringify(snaps)); } catch (e){} }, [snaps]);
   function shuffle(){
     if (!images.length){ toast(tr('shuffle.noStills')); return; }
     actions.setTpl(index, t => shuffleTpl(t, index, images));
@@ -322,6 +330,12 @@ export default function Editor({ index, tpl, images, env, actions, history, tab,
             </div>
           </div>
           <p className="hint">{tr('editor.hint')}</p>
+          <div className="snaps">
+            <span>{tr('editor.anchors')}</span>
+            {['photo', 'text'].map(k => (
+              <label key={k} className="tog"><input type="checkbox" checked={snaps[k]} onChange={e => setSnaps(o => ({ ...o, [k]: e.target.checked }))} />{tr('editor.anchors.' + k)}</label>
+            ))}
+          </div>
         </div>
         <aside className="panel">
           <nav className="tabs" role="tablist">
