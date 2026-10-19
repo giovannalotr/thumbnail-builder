@@ -7,6 +7,7 @@ import Toast from './components/Toast.jsx';
 import { exportTpls } from './lib/exporter.js';
 import { makeGrade } from './lib/grade.js';
 import { decodeImages, isImageFile } from './lib/images.js';
+import { loadSamples } from './lib/samples.js';
 import { toast } from './lib/toast.js';
 import { makeMine, mineStore, writeMine } from './lib/userTemplates.js';
 import { useStore, useTr } from './state.js';
@@ -37,6 +38,7 @@ export default function App(){
     try { localStorage.setItem('tb-prevbg', prevBg); } catch (e){}
   }, [prevBg]);
   useEffect(() => { try { localStorage.setItem('tb-archived', JSON.stringify(archived)); } catch (e){} }, [archived]);
+  useEffect(() => { loadSamples().then(actions.addSamples); }, [actions]);
   const mineJson = useMemo(() => mineStore(state.tpls), [state.tpls]);
   useEffect(() => writeMine(mineJson), [mineJson]);
 

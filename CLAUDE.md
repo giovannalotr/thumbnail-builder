@@ -31,7 +31,7 @@ Code comments are in Brazilian Portuguese. UI text lives in `src/locales/` (see 
 
 ### Two layers
 
-- `src/lib/`: framework-free canvas code (templates, color grade, textures, fonts, sample images, rendering, export). Keep React out of it.
+- `src/lib/`: framework-free canvas code (templates, color grade, textures, fonts, sample photos, rendering, export). Keep React out of it.
 - `src/App.jsx`, `src/state.js`, `src/components/`: the React UI. `GridView` is the home screen; `Editor` (+ `EditorPanels`) edits one template.
 
 ### Template model (`src/lib/templates.js`)
@@ -61,6 +61,10 @@ Code comments are in Brazilian Portuguese. UI text lives in `src/locales/` (see 
 - `tr(key, params)` reads the current language at call time, so `src/lib` modules (toasts, export file names) call it directly. Components get it from `useTr()` in `state.js`, which re-renders them when the language changes; call it in every component that shows text.
 - `{name}` placeholders come from `params`. With `params.n`, `key_one` / `key_other` is chosen by `Intl.PluralRules` (pt-BR treats 0 as singular).
 - Lists in `src/lib` (`FILTERS`, `TEXTURES`, `FCATS`, `DEFS`) hold ids only; display names are the keys `filters.<id>`, `texture.<id>`, `fontCat.<id>` and `tpl.<id>` (`tplName(t)`). Sample stills are named with `imgName(im)`.
+
+### Sample photos (`src/lib/samples.js`)
+
+The six sample stills are Unsplash photos in `src/assets/samples/` (credits in the README). They load asynchronously: state starts with `images: []`, `App` calls `loadSamples()` and `addSamples` adds them only if nothing was uploaded meanwhile. Their order decides which photo fills each slot by default (`imgFor`), and their ids (`ex-<scene>`) are what `addImages` clears from slots when real stills arrive.
 
 ### Fonts (`src/lib/fonts.js`)
 

@@ -5,7 +5,6 @@ export function mk(w, h){ const c = document.createElement('canvas'); c.width = 
 export function rrect(x, X, Y, W, H, R){ R = Math.max(0, Math.min(R, W / 2, H / 2)); x.beginPath(); x.moveTo(X + R, Y); x.arcTo(X + W, Y, X + W, Y + H, R); x.arcTo(X + W, Y + H, X, Y + H, R); x.arcTo(X, Y + H, X, Y, R); x.arcTo(X, Y, X + W, Y, R); x.closePath(); }
 export function hex2rgb(h){ h = (h || '#000').replace('#', ''); if (h.length === 3) h = h.split('').map(c => c + c).join(''); const n = parseInt(h, 16); return [n >> 16 & 255, n >> 8 & 255, n & 255]; }
 export function rgba(h, a){ const [r, g, b] = hex2rgb(h); return `rgba(${r},${g},${b},${a})`; }
-export function shade(h, amt){ const c = hex2rgb(h), t = amt < 0 ? 0 : 255, p = Math.abs(amt); return '#' + c.map(v => Math.round(v + (t - v) * p).toString(16).padStart(2, '0')).join(''); }
 export const slug = s => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 
 /* Leitura e escrita imutável por caminho, como "texts.0.shadow.blur" */

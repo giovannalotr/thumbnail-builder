@@ -1,7 +1,6 @@
 import { useMemo, useState, useSyncExternalStore } from 'react';
 import { getLang, onLang, tr } from './lib/i18n.js';
 import { imgFor } from './lib/render.js';
-import { sampleImages } from './lib/samples.js';
 import { DEFS, makeTpl } from './lib/templates.js';
 import { readMine, saveMine } from './lib/userTemplates.js';
 
@@ -10,7 +9,7 @@ function readArchived(){
   try { const v = JSON.parse(localStorage.getItem('tb-archived') || '[]'); return Array.isArray(v) ? v.filter(id => DEFS.some(d => d.id === id)) : []; } catch (e){ return []; }
 }
 const initialState = () => ({
-  images: sampleImages(), imgVer: 0, filter: 'natural', amt: 1, grain: 0, vig: 0, size: 1920, fmt: 'jpg',
+  images: [], imgVer: 0, filter: 'natural', amt: 1, grain: 0, vig: 0, size: 1920, fmt: 'jpg',
   prevBg: readPrevBg(), tpls: [...DEFS.map(makeTpl), ...readMine()], archived: readArchived(), showArchived: false,
 });
 const replaceAt = (a, i, v) => a.map((x, k) => k === i ? v : x);
@@ -47,6 +46,8 @@ export function useStore(){
       const tpls = hadSamples ? clearSlots(s.tpls, sl => sl.img && sl.img.startsWith('ex-')) : s.tpls;
       return { ...s, images: [...images, ...added], tpls, imgVer: s.imgVer + 1 };
     }),
+    // As fotos de exemplo chegam depois do primeiro desenho; se a pessoa já enviou stills, ficam de fora
+    addSamples: list => setState(s => s.images.length ? s : { ...s, images: list, imgVer: s.imgVer + 1 }),
     removeImage: id => setState(s => ({ ...s, images: s.images.filter(i => i.id !== id), tpls: clearSlots(s.tpls, sl => sl.img === id), imgVer: s.imgVer + 1 })),
     setTpl: (i, fn) => setState(s => ({ ...s, tpls: replaceAt(s.tpls, i, fn(s.tpls[i])) })),
     editTpl: (i, fn) => setState(s => ({ ...s, tpls: replaceAt(s.tpls, i, { ...fn(s.tpls[i]), edited: true }) })),

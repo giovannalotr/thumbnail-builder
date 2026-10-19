@@ -9,7 +9,7 @@ export default function Stills({ images, onFiles, onRemove }){
       <div className="sample-flag" hidden={!images.some(i => i.sample)}>{tr('stills.samples')}</div>
       <div className="tray">
         {images.map(i => (
-          <div className="still" key={i.id} title={imgName(i)}>
+          <div className="still" key={i.id} title={i.sample ? `${imgName(i)} — ${tr('stills.credit', { author: i.author })}` : imgName(i)}>
             <img src={i.thumb} alt={imgName(i)} /><span className="res">{i.w}×{i.h}</span>
             <button className="x" onClick={() => onRemove(i.id)} aria-label={tr('stills.remove', { name: imgName(i) })}>×</button>
           </div>

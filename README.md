@@ -25,7 +25,21 @@ O build usa caminhos relativos (`base: './'` em `vite.config.js`), então funcio
 
 ## Organização do código
 
-- `src/lib/`: desenho em canvas, sem React. Templates e layouts (`templates.js`), "Meus templates" e o arquivo .json (`userTemplates.js`), filtros de cor (`grade.js`), texturas, fontes, imagens de exemplo, renderização (`render.js`) e exportação (`exporter.js`).
+- `src/lib/`: desenho em canvas, sem React. Templates e layouts (`templates.js`), "Meus templates" e o arquivo .json (`userTemplates.js`), filtros de cor (`grade.js`), texturas, fontes, fotos de exemplo (`samples.js`), renderização (`render.js`) e exportação (`exporter.js`).
 - `src/state.js`: estado do app e as ações que o alteram.
 - `src/locales/`: textos da interface em português do Brasil (padrão) e em inglês; `src/lib/i18n.js` escolhe o idioma.
 - `src/components/`: interface em React. `GridView` é a tela inicial; `Editor` e `EditorPanels` formam o editor de um template.
+- `src/assets/samples/`: as fotos de exemplo que aparecem antes de a pessoa enviar as próprias stills.
+
+## Fotos de exemplo
+
+As seis fotos de exemplo vêm do [Unsplash](https://unsplash.com) e são usadas sob a [Unsplash License](https://unsplash.com/license) (uso livre, inclusive comercial, sem atribuição obrigatória). Foram recortadas em 1600 × 900.
+
+| Arquivo | Foto | Autor |
+|---|---|---|
+| `colinas.jpg` | [Rolling green hills and forests under a hazy sky](https://unsplash.com/photos/hlI7x6blRNg) | Vital Adi |
+| `bosque.jpg` | [Autumn forest with vibrant golden and orange leaves](https://unsplash.com/photos/dsll1jgW_FA) | James Wainscoat |
+| `vela.jpg` | [White pillar candle beside orange pumpkin and white pumpkin](https://unsplash.com/photos/o1CJ6cdd0U0) | Svitlana |
+| `ovelhas.jpg` | [Sheep grazing in a lush green pasture with rolling hills](https://unsplash.com/photos/Rtr1WwcwkoU) | Clovis Wood |
+| `trilha.jpg` | [A path through an autumn forest with colorful leaves](https://unsplash.com/photos/KS7vJpNPqRA) | Wolfgang Hasselmann |
+| `janela.jpg` | [A window sill with candles and blankets on it](https://unsplash.com/photos/-vvWGNq1qIk) | Kristīne Kozaka |
