@@ -1,6 +1,10 @@
 /* Textos da interface em inglês. Mesmas chaves de pt-BR.js. */
 export default {
   'header.language': 'Language',
+  'theme.change': 'Theme: {name}. Click to switch to {next}.',
+  'theme.auto': 'automatic (follows the system)',
+  'theme.light': 'light',
+  'theme.dark': 'dark',
 
   'files.none': 'No images found. Upload JPG, PNG or WebP files.',
   'files.loading_one': 'Loading {n} still…',

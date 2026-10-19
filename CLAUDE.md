@@ -90,4 +90,4 @@ Renders each selected template at the chosen size with `hi: true` and downloads 
 
 ### Styles
 
-`src/styles.css` is the original CSS with light/dark tokens on `:root`. `#root` uses `display: contents` so the layout (including the sticky header) behaves as if the components were direct children of `<body>`.
+`src/styles.css` is the original CSS with light/dark tokens on `:root`. The theme follows the system unless `<html>` has `data-theme="light" | "dark"`, set by the header button (`Header.jsx`, saved as `tb-theme`) and, on load, by an inline script in `index.html` so the first paint already uses it. `#root` uses `display: contents` so the layout (including the sticky header) behaves as if the components were direct children of `<body>`.

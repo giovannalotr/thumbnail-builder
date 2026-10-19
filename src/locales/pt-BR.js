@@ -2,6 +2,10 @@
    Chaves com _one e _other são as formas de plural escolhidas pelo parâmetro n (ver tr em lib/i18n.js). */
 export default {
   'header.language': 'Idioma',
+  'theme.change': 'Tema: {name}. Clique para mudar para {next}.',
+  'theme.auto': 'automático (segue o sistema)',
+  'theme.light': 'claro',
+  'theme.dark': 'escuro',
 
   'files.none': 'Nenhuma imagem encontrada. Envie arquivos JPG, PNG ou WebP.',
   'files.loading_one': 'Carregando {n} still…',
