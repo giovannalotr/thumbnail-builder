@@ -1,11 +1,11 @@
 import { BW, mk, rrect, rgba } from './util.js';
-import { applyGrade } from './grade.js';
+import { applyGrade, gradeOf } from './grade.js';
 import { blurCanvas } from './blur.js';
 import { paintTexture } from './textures.js';
 import { fstr } from './fonts.js';
 import { featherMask, slotGeo } from './templates.js';
 
-/* env = { images, imgVer, grade }: o que, além do próprio template, muda o desenho.
+/* env = { images, imgVer }: o que, além do próprio template, muda o desenho; o filtro de cor é do template (t.filter).
    ti é a posição do template na lista; define qual still preenche cada espaço vazio. */
 export function imgFor(t, si, images, ti){
   const sl = t.slots[si];
@@ -37,12 +37,12 @@ function photoLayer(t, ti, W, H, hi, env){
     featherMask(lx, lc.width, lc.height, m);
     x.globalCompositeOperation = 'lighter'; x.drawImage(lc, e.x, e.y); x.globalCompositeOperation = 'source-over';
   });
-  applyGrade(c, env.grade);
+  applyGrade(c, gradeOf(t.filter));
   return c;
 }
 const PHOTO = new Map();
 function cachedPhoto(t, ti, W, H, env){
-  const key = JSON.stringify([t.def.id, t.slots, t.border.outer, t.border.gap, t.border.radius, t.border.blend, env.imgVer, env.grade.key, env.images.length]);
+  const key = JSON.stringify([t.def.id, t.slots, t.border.outer, t.border.gap, t.border.radius, t.border.blend, env.imgVer, gradeOf(t.filter).key, env.images.length]);
   const ck = ti + ':' + W, hit = PHOTO.get(ck);
   if (hit && hit.key === key) return hit.c;
   const c = photoLayer(t, ti, W, H, false, env); PHOTO.set(ck, { key, c }); return c;

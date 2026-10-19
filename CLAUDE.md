@@ -37,22 +37,22 @@ Code comments are in Brazilian Portuguese. UI text lives in `src/locales/` (see 
 ### Template model (`src/lib/templates.js`)
 
 - `DEFS` lists the 12 default templates. `layout` is a recursive tree: `0` is a photo slot, `'x'` an empty spacer, `{ d: 'r' | 'c', s: [weights], k: [children] }` a row/column split. Slot indexes follow depth-first order.
-- `makeTpl(def)` builds the editable template: `{ key, def, slots: [{ img, zoom, px, py, flip }], texts: [...], border: { outer, gap, radius, color, tex, amt, blend }, pick, edited }`. `key` is stable (`def.id` for defaults) and identifies a template everywhere (editor, undo history, archive, card keys); indexes shift when a saved template is deleted.
+- `makeTpl(def)` builds the editable template: `{ key, def, slots: [{ img, zoom, px, py, flip }], texts: [...], border: { outer, gap, radius, color, tex, amt, blend }, filter: { id, amt, grain, vig }, pick, edited }`. `key` is stable (`def.id` for defaults) and identifies a template everywhere (editor, undo history, archive, card keys); indexes shift when a saved template is deleted.
 - Geometry is designed on a 1280×720 base (`BW`); sizes scale by `W / BW`, and text positions (`x`, `y`) are fractions of the canvas.
 
 ### My templates (`src/lib/userTemplates.js`)
 
 - A saved template is `{ key: 'm-…', mine: true, name, def, slots, texts, border, pick, edited, saved }`. `def` is the default template it derives from (its layout); files and storage call it `base`. `saved` is the JSON of the last saved version, and `isDirty(t)` compares against it. Saving a default template in the editor creates a copy and switches the editor to it.
 - Stills are not part of a template: in memory slots keep `img` for the session, but `saved`, localStorage (`tb-mine`) and exported files keep only `zoom`, `px`, `py` and `flip`. Renaming is stored right away; other edits only on save.
-- Export/import file: `{ format: 'thumb-builder-template', version: 1, name, base, slots, texts, border }`. Everything read back (files and `tb-mine`) goes through `readTemplate`, which rejects unknown bases or a wrong slot count, keeps only known keys and clamps numbers to the editor's slider ranges; keep those ranges in sync with `EditorPanels`.
+- Export/import file: `{ format: 'thumb-builder-template', version: 1, name, base, slots, texts, border, filter }`. Everything read back (files and `tb-mine`) goes through `readTemplate`, which rejects unknown bases or a wrong slot count, keeps only known keys and clamps numbers to the editor's slider ranges; keep those ranges in sync with `EditorPanels`.
 
 ### Rendering (`src/lib/render.js`)
 
 `renderTpl(t, ti, W, H, env, { canvas, hi })` paints border color → texture → photo layer → texts and returns `{ canvas, boxes }`, where `boxes` are the text bounding boxes (fractions) that the editor uses for hit testing.
 
-- `env = { images, imgVer, grade }` carries everything outside the template that affects the drawing; pass it explicitly instead of reading globals.
+- `env = { images, imgVer }` carries everything outside the template that affects the drawing; pass it explicitly instead of reading globals. The color filter belongs to each template (`t.filter = { id, amt, grain, vig }`, default `makeFilter()`: natural color); `gradeOf(t.filter)` in `grade.js` builds and caches the grade.
 - `ti` (template index) matters: a slot without an assigned image falls back to `images[(ti + si) % images.length]` (`imgFor`).
-- The photo layer (with the per-pixel color grade) is cached per `ti:W`, keyed by JSON of the base template id, slots, border geometry, `imgVer`, `grade.key` and image count. Anything new that changes the photo layer must go into that key.
+- The photo layer (with the per-pixel color grade) is cached per `ti:W`, keyed by JSON of the base template id, slots, border geometry, `imgVer`, the filter's grade key and image count. Anything new that changes the photo layer must go into that key.
 - `hi: true` (export) draws from full-resolution sources; otherwise previews capped at 1600 px are used.
 
 ### Internationalization (`src/lib/i18n.js`, `src/locales/`)
@@ -73,9 +73,9 @@ The six sample stills are Unsplash photos in `src/assets/samples/` (credits in t
 ### State and redraws
 
 - `state.js` holds one immutable state object; `actions` is stable. `tpls` holds the 12 defaults followed by the saved templates. `archived` lists the keys of archived default templates (saved in localStorage `tb-archived`); bulk actions (shuffle, apply borders to all) skip them, archiving unselects the template, and "select all" exists per grid section (My templates, defaults), never for the archived one. A template's index (`ti`) is always its position in the full `tpls` list, never in a filtered one.
-- `editTpl` marks the template as edited, `setTpl` does not. Edited default templates are kept in localStorage `tb-edited` (`{ [id]: { slots, texts, border } }`, without stills, read back through `readTemplate`), so edits survive a reload; resetting a template in the editor clears `edited` and drops its entry. Use `setIn` / `patchIn` from `util.js` with dotted paths such as `texts.0.shadow.blur`.
+- `editTpl` marks the template as edited, `setTpl` does not. Edited default templates are kept in localStorage `tb-edited` (`{ [id]: { slots, texts, border, filter } }`, without stills, read back through `readTemplate`), so edits survive a reload; resetting a template in the editor clears `edited` and drops its entry. Use `setIn` / `patchIn` from `util.js` with dotted paths such as `texts.0.shadow.blur`.
 - Canvas effects depend on the identities of `slots`, `texts` and `border`, so updates must create new objects or nothing redraws.
-- Grid cards draw through `lib/scheduler.js` (one job per macrotask; scheduling the same key replaces a pending job), and the grid uses a 90 ms debounced grade so slider drags stay responsive.
+- Grid cards draw through `lib/scheduler.js` (one job per macrotask; scheduling the same key replaces a pending job).
 
 ### Editor (`src/components/Editor.jsx`)
 
@@ -83,7 +83,7 @@ The six sample stills are Unsplash photos in `src/assets/samples/` (credits in t
 - `App` tracks the open template by `key` and mounts the editor with `key={key}`; the active tab and the per-template undo history (by key) live in `App`, so they survive closing and reopening the editor.
 - Dragging a text snaps it (`snapAxis`): the text's middle snaps to the centers of the thumbnail and of each photo (`textAnchors`), and its edges or middle snap to the edges and middles of the other texts (`textEdges`, from the render `boxes`). Two toggle buttons in the editor's top bar ("Anchors") turn each kind off (saved as `tb-anchors`).
 - Above the panel tabs, a collapsible small preview (`tb-mini` remembers if it is open) renders the template at its on-screen width through the scheduler, to show it at YouTube thumbnail size.
-- History stores JSON snapshots of `{ slots, texts, border }`, committed after 350 ms without changes and never during a drag.
+- History stores JSON snapshots of `{ slots, texts, border, filter }`, committed after 350 ms without changes and never during a drag.
 - The wheel (zoom) listener is attached manually as non-passive because React registers `onWheel` as passive.
 - Photo-swap drag state is kept in a ref, since `pointerup` can arrive before the last `pointermove` re-render.
 

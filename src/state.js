@@ -13,11 +13,11 @@ function readDefaults(){
   const edits = readEdited();
   return DEFS.map(d => {
     const t = makeTpl(d), e = edits[d.id];
-    return e ? { ...t, slots: e.slots.map(s => ({ img: null, ...s })), texts: e.texts, border: e.border, edited: true } : t;
+    return e ? { ...t, slots: e.slots.map(s => ({ img: null, ...s })), texts: e.texts, border: e.border, filter: e.filter, edited: true } : t;
   });
 }
 const initialState = () => ({
-  images: [], imgVer: 0, filter: 'natural', amt: 1, grain: 0, vig: 0, size: 1920, fmt: 'jpg',
+  images: [], imgVer: 0, size: 1920, fmt: 'jpg',
   prevBg: readPrevBg(), tpls: [...readDefaults(), ...readMine()], archived: readArchived(), showArchived: false,
 });
 const replaceAt = (a, i, v) => a.map((x, k) => k === i ? v : x);

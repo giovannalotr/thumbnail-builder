@@ -143,6 +143,7 @@ export default {
   'editor.tab.imagens': 'Images',
   'editor.tab.textos': 'Texts',
   'editor.tab.bordas': 'Borders',
+  'editor.tab.filtros': 'Filters',
   'editor.undo': 'Undo',
   'editor.undoTitle': 'Undo (Ctrl+Z)',
   'editor.redo': 'Redo',

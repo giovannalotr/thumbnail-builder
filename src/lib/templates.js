@@ -1,4 +1,5 @@
 import { BW, clamp } from './util.js';
+import { makeFilter } from './grade.js';
 import { tr } from './i18n.js';
 
 const R2 = (a, b) => ({ d: 'r', s: [1, 1], k: [a, b] });
@@ -57,7 +58,7 @@ export const makeBorder = o => Object.assign({ outer: 0, gap: 0, radius: 0, colo
 export function countSlots(n){ return n === 0 ? 1 : n === 'x' ? 0 : n.k.reduce((a, c) => a + countSlots(c), 0); }
 export function makeTpl(def){
   return { key: def.id, def, slots: Array.from({ length: countSlots(def.layout) }, () => ({ img: null, zoom: 1, px: 0, py: 0, flip: false })),
-    texts: def.texts.map(o => makeText(JSON.parse(JSON.stringify(o)))), border: makeBorder(def.border), pick: false, edited: false };
+    texts: def.texts.map(o => makeText(JSON.parse(JSON.stringify(o)))), border: makeBorder(def.border), filter: makeFilter(), pick: false, edited: false };
 }
 /* Nome para a interface: o que a pessoa deu, nos templates salvos, ou o nome traduzido do template padrão */
 export const tplName = t => t.mine ? t.name : tr('tpl.' + t.def.id);

@@ -4,7 +4,6 @@ import { toast } from '../lib/toast.js';
 import { makeMine, parseTemplateFile, templateFile } from '../lib/userTemplates.js';
 import { slug } from '../lib/util.js';
 import { useTr } from '../state.js';
-import ColorFilter from './ColorFilter.jsx';
 import PreviewBgPicker from './PreviewBgPicker.jsx';
 import Stills from './Stills.jsx';
 import TemplateGrid from './TemplateGrid.jsx';
@@ -50,7 +49,6 @@ export default function GridView({ state, actions, env, loading, onEdit, onExpor
     <main id="gridView" className="gut">
       <section className="deck">
         <Stills images={state.images} loading={loading} onFiles={onFiles} onRemove={onRemoveImage} />
-        <ColorFilter state={state} actions={actions} />
         <div className="block">
           <div className="block-head"><h2>{tr('preview.title')}</h2></div>
           <div className="split">

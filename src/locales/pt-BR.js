@@ -144,6 +144,7 @@ export default {
   'editor.tab.imagens': 'Imagens',
   'editor.tab.textos': 'Textos',
   'editor.tab.bordas': 'Bordas',
+  'editor.tab.filtros': 'Filtros',
   'editor.undo': 'Desfazer',
   'editor.undoTitle': 'Desfazer (Ctrl+Z)',
   'editor.redo': 'Refazer',

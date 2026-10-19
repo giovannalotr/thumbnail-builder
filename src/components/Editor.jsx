@@ -8,12 +8,13 @@ import { isDirty, revertMine } from '../lib/userTemplates.js';
 import { BW, clamp, patchIn, setIn } from '../lib/util.js';
 import { shuffleTpl, useTr } from '../state.js';
 import { BordersPanel, ImagesPanel, TextsPanel } from './EditorPanels.jsx';
+import FilterPanel from './FilterPanel.jsx';
 import PreviewBgPicker from './PreviewBgPicker.jsx';
 import { useDismiss } from './controls.jsx';
 import { IconChevron, IconDownload, IconRedo, IconSave, IconShuffle, IconSnapPhoto, IconSnapText, IconSwap, IconUndo } from './icons.jsx';
 
-const TABS = ['imagens', 'textos', 'bordas'];
-const snap = t => JSON.stringify({ slots: t.slots, texts: t.texts, border: t.border });
+const TABS = ['imagens', 'textos', 'bordas', 'filtros'];
+const snap = t => JSON.stringify({ slots: t.slots, texts: t.texts, border: t.border, filter: t.filter });
 /* Âncora mais próxima de v dentro da tolerância: a posição dela e todas as linhas que passam por ali */
 function snapTo(list, v, tol){
   let p = null;
@@ -87,7 +88,7 @@ export default function Editor({ index, tpl, images, env, actions, history, tab,
   }
   function applySnap(s){
     const o = JSON.parse(s); history.last = s;
-    actions.setTpl(index, t => ({ ...t, slots: o.slots, texts: o.texts, border: o.border, edited: true }));
+    actions.setTpl(index, t => ({ ...t, slots: o.slots, texts: o.texts, border: o.border, filter: o.filter, edited: true }));
     setTextSel(n => clamp(n, 0, Math.max(0, o.texts.length - 1))); setSlotSel(n => clamp(n, 0, o.slots.length - 1)); setFontOpen(false); bump();
   }
   function undo(){ commit(tpl); if (!history.undo.length){ toast(tr('editor.nothingToUndo'), 1200); return; } history.redo.push(history.last); applySnap(history.undo.pop()); }
@@ -370,6 +371,7 @@ export default function Editor({ index, tpl, images, env, actions, history, tab,
             {tab === 'imagens' && <ImagesPanel {...panelProps} slotSel={slotSel} setSlotSel={setSlotSel} />}
             {tab === 'textos' && <TextsPanel {...panelProps} textSel={textSel} setTextSel={setTextSel} fontOpen={fontOpen} setFontOpen={setFontOpen} boxesRef={boxesRef} />}
             {tab === 'bordas' && <BordersPanel {...panelProps} onBorderAll={borderAll} />}
+            {tab === 'filtros' && <FilterPanel {...panelProps} />}
           </div>
         </aside>
       </div>

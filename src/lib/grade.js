@@ -49,3 +49,13 @@ export function applyGrade(c, g){
   }
   x.putImageData(im, 0, 0);
 }
+/* Filtro de um template (t.filter): id de FILTERS, intensidade, grão e vinheta. Os templates padrão começam em cor natural */
+export const makeFilter = () => ({ id: 'natural', amt: 1, grain: 0, vig: 0 });
+const GRADES = new Map();
+/* Grade pronta para um filtro, guardada pela chave para não refazer as tabelas a cada desenho */
+export function gradeOf(f){
+  const k = [f.id, f.amt, f.grain, f.vig].join('|');
+  let g = GRADES.get(k);
+  if (!g){ if (GRADES.size > 200) GRADES.clear(); g = makeGrade(f.id, f.amt, f.grain, f.vig); GRADES.set(k, g); }
+  return g;
+}

@@ -11,8 +11,8 @@ import { IconCheck, IconDownload } from './icons.jsx';
 
 function TemplateCard({ tpl, index, W, env, archived, onEdit, onPick, onDownload, onArchive, onDelete, onExportJson }){
   const tr = useTr(), ref = useRef(null);
-  const { slots, texts, border } = tpl, n = slots.length, name = tplName(tpl);
-  // Só fotos, textos, bordas, stills e filtro mudam o desenho; marcar o card não redesenha.
+  const { slots, texts, border, filter } = tpl, n = slots.length, name = tplName(tpl);
+  // Só fotos, textos, bordas, filtro e stills mudam o desenho; marcar o card não redesenha.
   useEffect(() => {
     if (!W) return;
     const key = 'card:' + tpl.key;
@@ -21,7 +21,7 @@ function TemplateCard({ tpl, index, W, env, archived, onEdit, onPick, onDownload
     draw();
     const p = needFonts(texts); if (p) p.then(draw);
     return () => { alive = false; cancel(key); };
-  }, [slots, texts, border, index, W, env]);
+  }, [slots, texts, border, filter, index, W, env]);
   const badge = tpl.mine ? (isDirty(tpl) ? tr('card.unsaved') : '') : (tpl.edited ? tr('card.edited') : '');
   const items = [{ id: 'json', label: tr('card.exportJson'), run: onExportJson }];
   if (tpl.mine) items.push({ id: 'del', label: tr('card.delete'), confirm: tr('card.deleteConfirm'), danger: true, run: onDelete });

@@ -4,8 +4,8 @@ import { useTr } from '../state.js';
 export default function Stills({ images, loading, onFiles, onRemove }){
   const tr = useTr(), n = images.filter(i => !i.sample).length;
   return (
-    <div className="block">
-      <div className="block-head"><h2>{tr('stills.title')}</h2><span className="note">{loading.length ? tr('files.loading', { n: loading.length }) : n ? tr('stills.count', { n }) : tr('stills.formats')}</span></div>
+    <div className="block wide">
+      <div className="block-head start"><h2>{tr('stills.title')}</h2><span className="note">{loading.length ? tr('files.loading', { n: loading.length }) : n ? tr('stills.count', { n }) : tr('stills.formats')}</span></div>
       <div className="sample-flag" hidden={!images.some(i => i.sample)}>{tr('stills.samples')}</div>
       <div className="tray">
         {images.map(i => (

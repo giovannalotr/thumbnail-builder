@@ -5,7 +5,6 @@ import Header from './components/Header.jsx';
 import { applyPrevBg } from './components/PreviewBgPicker.jsx';
 import Toast from './components/Toast.jsx';
 import { exportTpls } from './lib/exporter.js';
-import { makeGrade } from './lib/grade.js';
 import { decodeImages, isImageFile } from './lib/images.js';
 import { imgFor } from './lib/render.js';
 import { loadSamples } from './lib/samples.js';
@@ -19,12 +18,6 @@ const routeKey = () => { const m = /^#\/edit\/(.+)$/.exec(location.hash); return
 const editHash = key => '#/edit/' + encodeURIComponent(key);
 const gridUrl = () => location.pathname + location.search;
 
-function useDebounced(value, ms){
-  const [v, setV] = useState(value);
-  useEffect(() => { const t = setTimeout(() => setV(value), ms); return () => clearTimeout(t); }, [value, ms]);
-  return v;
-}
-
 export default function App(){
   const [state, actions] = useStore();
   const tr = useTr();
@@ -35,12 +28,8 @@ export default function App(){
   // Stills ainda decodificando ({ id, name }): a faixa de stills mostra um esqueleto para cada uma
   const [loading, setLoading] = useState([]);
   const histories = useRef({}).current;
-  const { images, imgVer, filter, amt, grain, vig, prevBg, archived } = state;
-  const grade = useMemo(() => makeGrade(filter, amt, grain, vig), [filter, amt, grain, vig]);
-  const env = useMemo(() => ({ images, imgVer, grade }), [images, imgVer, grade]);
-  // A grade redesenha os 12 templates; espera o controle deslizante parar por 90 ms
-  const gridGrade = useDebounced(grade, 90);
-  const gridEnv = useMemo(() => ({ images, imgVer, grade: gridGrade }), [images, imgVer, gridGrade]);
+  const { images, imgVer, prevBg, archived } = state;
+  const env = useMemo(() => ({ images, imgVer }), [images, imgVer]);
 
   useEffect(() => {
     applyPrevBg(prevBg);
@@ -106,7 +95,7 @@ export default function App(){
   // em outra posição, então guarda explicitamente as imagens que estavam na tela
   const saveAs = name => {
     const t = state.tpls[ei], slots = t.slots.map((sl, si) => ({ ...sl, img: (imgFor(t, si, images, ei) || {}).id || null }));
-    const m = makeMine({ name, base: t.def.id, slots, texts: t.texts, border: t.border });
+    const m = makeMine({ name, base: t.def.id, slots, texts: t.texts, border: t.border, filter: t.filter });
     actions.addTemplates([m]); history.replaceState(history.state, '', editHash(m.key)); setEditing(m.key);
   };
 
@@ -114,7 +103,7 @@ export default function App(){
     <>
       <Header />
       {ei < 0
-        ? <GridView state={state} actions={actions} env={gridEnv} onEdit={i => openEditor(state.tpls[i].key)} onExport={onExport} loading={loading} onFiles={loadFiles} onRemoveImage={removeImage} />
+        ? <GridView state={state} actions={actions} env={env} onEdit={i => openEditor(state.tpls[i].key)} onExport={onExport} loading={loading} onFiles={loadFiles} onRemoveImage={removeImage} />
         : <Editor key={editing} index={ei} tpl={state.tpls[ei]} images={images} env={env} actions={actions} history={histories[editing] || (histories[editing] = { undo: [], redo: [], last: null })}
             tab={edTab} setTab={setEdTab} prevBg={prevBg} onPrevBg={setPrevBg} onClose={closeEditor} onExport={onExport} onSaveAs={saveAs} />}
       <div id="drop" hidden={!dropping}>{tr('files.drop')}</div>
