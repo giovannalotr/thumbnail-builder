@@ -161,9 +161,9 @@ export default {
   'editor.blendAll': 'Transição suave aplicada a todos os templates.',
   'editor.bordersAll': 'Bordas aplicadas a todos os templates.',
   'editor.mini': 'Prévia',
-  'editor.anchors': 'Âncoras ao mover textos:',
-  'editor.anchors.photo': 'centro da thumb e das fotos',
-  'editor.anchors.text': 'outros textos',
+  'editor.anchors': 'Âncoras',
+  'editor.anchors.photo': 'Âncoras no centro da thumb e das fotos',
+  'editor.anchors.text': 'Âncoras nas bordas e no meio dos outros textos',
   'editor.hint': 'Arraste uma foto para reposicionar · role sobre ela para zoom · arraste um texto para movê-lo · arraste o ícone ⇄ de uma foto até outra para trocá-las de lugar',
 
   'images.empty': 'Envie imagens para preencher este template.',

@@ -14,3 +14,6 @@ export const IconMoon = () => <svg {...PJ}><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5
 export const IconCheck = () => <svg {...PJ}><path d="m5 12.5 4.5 4.5L19 7.5" /></svg>;
 export const IconSwap = () => <svg {...PJ}><path d="M4 8h15M15 4l4 4-4 4M20 16H5M9 12l-4 4 4 4" /></svg>;
 export const IconChevron = () => <svg {...PJ}><path d="m6 9 6 6 6-6" /></svg>;
+/* Âncoras: centro de uma foto (moldura com cruz) e alinhamento com outros textos (T sobre uma linha) */
+export const IconSnapPhoto = () => <svg {...PJ}><rect x="3" y="5" width="18" height="14" rx="2" /><path d="M12 9v6M9 12h6" /></svg>;
+export const IconSnapText = () => <svg {...PJ}><path d="M6 4h12M12 4v11M3 20h18" /></svg>;

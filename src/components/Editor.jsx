@@ -10,7 +10,7 @@ import { shuffleTpl, useTr } from '../state.js';
 import { BordersPanel, ImagesPanel, TextsPanel } from './EditorPanels.jsx';
 import PreviewBgPicker from './PreviewBgPicker.jsx';
 import { useDismiss } from './controls.jsx';
-import { IconChevron, IconDownload, IconRedo, IconSave, IconShuffle, IconSwap, IconUndo } from './icons.jsx';
+import { IconChevron, IconDownload, IconRedo, IconSave, IconShuffle, IconSnapPhoto, IconSnapText, IconSwap, IconUndo } from './icons.jsx';
 
 const TABS = ['imagens', 'textos', 'bordas'];
 const snap = t => JSON.stringify({ slots: t.slots, texts: t.texts, border: t.border });
@@ -310,6 +310,13 @@ export default function Editor({ index, tpl, images, env, actions, history, tab,
           : <h2>{tplName(tpl)}</h2>}
         <div className="ed-act">
           <PreviewBgPicker value={prevBg} onChange={onPrevBg} />
+          <div className="bgpick" role="group" aria-label={tr('editor.anchors')}>
+            <span className="lbl">{tr('editor.anchors')}</span>
+            {[['photo', IconSnapPhoto], ['text', IconSnapText]].map(([k, Icon]) => (
+              <button key={k} className={'bgs snap' + (snaps[k] ? ' on' : '')} aria-pressed={snaps[k]} title={tr('editor.anchors.' + k)} aria-label={tr('editor.anchors.' + k)}
+                onClick={() => setSnaps(o => ({ ...o, [k]: !o[k] }))}><Icon /></button>
+            ))}
+          </div>
           <button className="icon-btn" title={tr('editor.undoTitle')} aria-label={tr('editor.undo')} disabled={!history.undo.length} onClick={undo}><IconUndo /></button>
           <button className="icon-btn" title={tr('editor.redoTitle')} aria-label={tr('editor.redo')} disabled={!history.redo.length} onClick={redo}><IconRedo /></button>
           <button className="btn" onClick={shuffle}><IconShuffle />{tr('editor.shuffle')}</button>
@@ -348,12 +355,6 @@ export default function Editor({ index, tpl, images, env, actions, history, tab,
             </div>
           </div>
           <p className="hint">{tr('editor.hint')}</p>
-          <div className="snaps">
-            <span>{tr('editor.anchors')}</span>
-            {['photo', 'text'].map(k => (
-              <label key={k} className="tog"><input type="checkbox" checked={snaps[k]} onChange={e => setSnaps(o => ({ ...o, [k]: e.target.checked }))} />{tr('editor.anchors.' + k)}</label>
-            ))}
-          </div>
         </div>
         <aside className="panel">
           <div className="mini-prev">

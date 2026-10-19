@@ -160,9 +160,9 @@ export default {
   'editor.blendAll': 'Soft transition applied to all templates.',
   'editor.bordersAll': 'Borders applied to all templates.',
   'editor.mini': 'Preview',
-  'editor.anchors': 'Snap when moving texts to:',
-  'editor.anchors.photo': 'thumbnail and photo centers',
-  'editor.anchors.text': 'other texts',
+  'editor.anchors': 'Anchors',
+  'editor.anchors.photo': 'Snap to the thumbnail and photo centers',
+  'editor.anchors.text': 'Snap to the edges and middles of other texts',
   'editor.hint': 'Drag a photo to reposition it · scroll over it to zoom · drag a text to move it · drag a photo’s ⇄ icon onto another photo to swap them',
 
   'images.empty': 'Upload images to fill this template.',
