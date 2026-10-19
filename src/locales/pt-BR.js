@@ -64,6 +64,7 @@ export default {
   'card.images_one': '{n} imagem',
   'card.images_other': '{n} imagens',
   'card.select': 'Selecionar',
+  'card.selectLabel': 'Selecionar {name}',
   'card.downloadLabel': 'Baixar {name}',
   'common.download': 'Baixar',
   'card.archive': 'Arquivar',

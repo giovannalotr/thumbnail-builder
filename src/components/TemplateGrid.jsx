@@ -7,7 +7,7 @@ import { isDirty } from '../lib/userTemplates.js';
 import { clamp } from '../lib/util.js';
 import { useTr } from '../state.js';
 import { Menu } from './controls.jsx';
-import { IconDownload } from './icons.jsx';
+import { IconCheck, IconDownload } from './icons.jsx';
 
 function TemplateCard({ tpl, index, W, env, archived, onEdit, onPick, onDownload, onArchive, onDelete, onExportJson }){
   const tr = useTr(), ref = useRef(null);
@@ -37,7 +37,11 @@ function TemplateCard({ tpl, index, W, env, archived, onEdit, onPick, onDownload
           <p>{tr('card.images', { n })}{tpl.mine && ' · ' + tr('card.base', { name: tr('tpl.' + tpl.def.id) })}</p>
         </div>
         <div className="meta-r">
-          {!archived && <label className="check"><input type="checkbox" checked={tpl.pick} onChange={e => onPick(e.target.checked)} /> {tr('card.select')}</label>}
+          {!archived && (
+            <label className={'pickbox' + (tpl.pick ? ' on' : '')} title={tr('card.select')}>
+              <input type="checkbox" checked={tpl.pick} aria-label={tr('card.selectLabel', { name })} onChange={e => onPick(e.target.checked)} /><IconCheck />
+            </label>
+          )}
           <Menu label={tr('card.menu', { name })} items={items} />
           <button className="icon-btn" onClick={onDownload} aria-label={tr('card.downloadLabel', { name })} title={tr('common.download')}><IconDownload /></button>
         </div>
