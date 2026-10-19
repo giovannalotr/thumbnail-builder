@@ -27,7 +27,7 @@ Commit messages are always in English and follow Conventional Commits (`feat:`, 
 
 Static single-page app with no backend: all image processing happens in the browser on `<canvas>`. The app started as a single-file Claude artifact; the first commits in the history hold that original `index.html`, which is the reference for the expected behavior and look.
 
-UI text and code comments are in Brazilian Portuguese.
+Code comments are in Brazilian Portuguese. UI text lives in `src/locales/` (see Internationalization).
 
 ### Two layers
 
@@ -48,6 +48,13 @@ UI text and code comments are in Brazilian Portuguese.
 - `ti` (template index) matters: a slot without an assigned image falls back to `images[(ti + si) % images.length]` (`imgFor`).
 - The photo layer (with the per-pixel color grade) is cached per `ti:W`, keyed by JSON of the slots, border geometry, `imgVer`, `grade.key` and image count. Anything new that changes the photo layer must go into that key.
 - `hi: true` (export) draws from full-resolution sources; otherwise previews capped at 1600 px are used.
+
+### Internationalization (`src/lib/i18n.js`, `src/locales/`)
+
+- `pt-BR.js` (the default) and `en.js` are flat dictionaries with the same keys. The chosen language is saved in localStorage (`tb-lang`) and set on `<html lang>`.
+- `tr(key, params)` reads the current language at call time, so `src/lib` modules (toasts, export file names) call it directly. Components get it from `useTr()` in `state.js`, which re-renders them when the language changes; call it in every component that shows text.
+- `{name}` placeholders come from `params`. With `params.n`, `key_one` / `key_other` is chosen by `Intl.PluralRules` (pt-BR treats 0 as singular).
+- Lists in `src/lib` (`FILTERS`, `TEXTURES`, `FCATS`, `DEFS`) hold ids only; display names are the keys `filters.<id>`, `texture.<id>`, `fontCat.<id>` and `tpl.<id>` (`tplName(t)`). Sample stills are named with `imgName(im)`.
 
 ### Fonts (`src/lib/fonts.js`)
 

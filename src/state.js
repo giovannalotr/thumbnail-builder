@@ -1,4 +1,5 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useSyncExternalStore } from 'react';
+import { getLang, onLang, tr } from './lib/i18n.js';
 import { imgFor } from './lib/render.js';
 import { sampleImages } from './lib/samples.js';
 import { DEFS, makeTpl } from './lib/templates.js';
@@ -48,3 +49,6 @@ export function useStore(){
   }), []);
   return [state, actions];
 }
+
+/* Tradução para componentes: devolve tr e redesenha o componente quando o idioma muda */
+export function useTr(){ useSyncExternalStore(onLang, getLang); return tr; }

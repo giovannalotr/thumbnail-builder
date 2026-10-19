@@ -1,15 +1,15 @@
 import { useEffect, useLayoutEffect, useReducer, useRef, useState } from 'react';
 import { needFonts } from '../lib/fonts.js';
 import { imgFor, renderTpl } from '../lib/render.js';
-import { makeTpl, slotGeo, slotRects, textAnchors } from '../lib/templates.js';
+import { makeTpl, slotGeo, slotRects, textAnchors, tplName } from '../lib/templates.js';
 import { toast } from '../lib/toast.js';
 import { BW, clamp, patchIn, setIn } from '../lib/util.js';
-import { shuffleTpl } from '../state.js';
+import { shuffleTpl, useTr } from '../state.js';
 import { BordersPanel, ImagesPanel, TextsPanel } from './EditorPanels.jsx';
 import PreviewBgPicker from './PreviewBgPicker.jsx';
 import { IconDownload, IconRedo, IconShuffle, IconSwap, IconUndo } from './icons.jsx';
 
-const TABS = [['imagens', 'Imagens'], ['textos', 'Textos'], ['bordas', 'Bordas']];
+const TABS = ['imagens', 'textos', 'bordas'];
 const snap = t => JSON.stringify({ slots: t.slots, texts: t.texts, border: t.border });
 /* Âncora mais próxima de v dentro da tolerância: a posição dela e todas as linhas que passam por ali */
 function snapTo(list, v, tol){
@@ -20,6 +20,7 @@ function snapTo(list, v, tol){
 
 /* history = { undo, redo, last } e a aba ficam no App, então sobrevivem quando o editor fecha e abre de novo */
 export default function Editor({ index, tpl, images, env, actions, history, tab, setTab, prevBg, onPrevBg, onClose, onExport }){
+  const tr = useTr();
   const [textSel, setTextSel] = useState(0);
   const [slotSel, setSlotSel] = useState(0);
   const [fontOpen, setFontOpen] = useState(false);
@@ -50,8 +51,8 @@ export default function Editor({ index, tpl, images, env, actions, history, tab,
     actions.setTpl(index, t => ({ ...t, slots: o.slots, texts: o.texts, border: o.border, edited: true }));
     setTextSel(n => clamp(n, 0, Math.max(0, o.texts.length - 1))); setSlotSel(n => clamp(n, 0, o.slots.length - 1)); setFontOpen(false); bump();
   }
-  function undo(){ commit(tpl); if (!history.undo.length){ toast('Nada para desfazer.', 1200); return; } history.redo.push(history.last); applySnap(history.undo.pop()); }
-  function redo(){ commit(tpl); if (!history.redo.length){ toast('Nada para refazer.', 1200); return; } history.undo.push(history.last); applySnap(history.redo.pop()); }
+  function undo(){ commit(tpl); if (!history.undo.length){ toast(tr('editor.nothingToUndo'), 1200); return; } history.redo.push(history.last); applySnap(history.undo.pop()); }
+  function redo(){ commit(tpl); if (!history.redo.length){ toast(tr('editor.nothingToRedo'), 1200); return; } history.undo.push(history.last); applySnap(history.redo.pop()); }
   function close(){ commit(tpl); onClose(); }
 
   useEffect(() => { commit(tpl); window.scrollTo(0, 0); }, []);
@@ -194,7 +195,7 @@ export default function Editor({ index, tpl, images, env, actions, history, tab,
     swapRef.current = null; setSwap(null);
     if (e.type !== 'pointerup') return;
     if (sw.to >= 0 && sw.to !== sw.from) swapSlots(sw.from, sw.to);
-    else if (!sw.moved || sw.to === sw.from) toast('Arraste o ícone até outra foto para trocá-las de lugar.', 2200);
+    else if (!sw.moved || sw.to === sw.from) toast(tr('editor.swapHelp'), 2200);
   }
   function swapSlots(a, b){
     edit(t => {
@@ -212,16 +213,16 @@ export default function Editor({ index, tpl, images, env, actions, history, tab,
     clearTimeout(armRef.current); setArmed(false);
     commit(tpl); history.redo = [];
     actions.setTpl(index, t => ({ ...makeTpl(t.def), pick: t.pick }));
-    setTextSel(0); setSlotSel(0); bump(); toast('Template restaurado ao padrão.');
+    setTextSel(0); setSlotSel(0); bump(); toast(tr('editor.resetDone'));
   }
   useEffect(() => () => clearTimeout(armRef.current), []);
   function shuffle(){
-    if (!images.length){ toast('Envie stills para embaralhar.'); return; }
+    if (!images.length){ toast(tr('shuffle.noStills')); return; }
     actions.setTpl(index, t => shuffleTpl(t, index, images));
   }
   function borderAll(){
     actions.borderAll(index);
-    toast(tpl.border.blend > 0 ? 'Transição suave aplicada a todos os templates.' : 'Bordas aplicadas a todos os templates.');
+    toast(tr(tpl.border.blend > 0 ? 'editor.blendAll' : 'editor.bordersAll'));
   }
 
   const rs = slotRects(tpl, 1, 1), target = swap && swap.to >= 0 && swap.to !== swap.from ? rs[swap.to] : null;
@@ -229,15 +230,15 @@ export default function Editor({ index, tpl, images, env, actions, history, tab,
   return (
     <section id="editView">
       <div className="ed-top gut">
-        <button className="btn ghost" onClick={close}>← Templates</button>
-        <h2>{tpl.def.name}</h2>
+        <button className="btn ghost" onClick={close}>{tr('editor.back')}</button>
+        <h2>{tplName(tpl)}</h2>
         <div className="ed-act">
           <PreviewBgPicker value={prevBg} onChange={onPrevBg} />
-          <button className="icon-btn" title="Desfazer (Ctrl+Z)" aria-label="Desfazer" disabled={!history.undo.length} onClick={undo}><IconUndo /></button>
-          <button className="icon-btn" title="Refazer (Ctrl+Shift+Z)" aria-label="Refazer" disabled={!history.redo.length} onClick={redo}><IconRedo /></button>
-          <button className="btn" onClick={shuffle}><IconShuffle />Embaralhar</button>
-          <button className="btn ghost" onClick={reset}>{armed ? 'Confirmar: desfazer edições' : 'Restaurar padrão'}</button>
-          <button className="btn primary" onClick={() => onExport([index])}><IconDownload />Baixar</button>
+          <button className="icon-btn" title={tr('editor.undoTitle')} aria-label={tr('editor.undo')} disabled={!history.undo.length} onClick={undo}><IconUndo /></button>
+          <button className="icon-btn" title={tr('editor.redoTitle')} aria-label={tr('editor.redo')} disabled={!history.redo.length} onClick={redo}><IconRedo /></button>
+          <button className="btn" onClick={shuffle}><IconShuffle />{tr('editor.shuffle')}</button>
+          <button className="btn ghost" onClick={reset}>{tr(armed ? 'editor.resetConfirm' : 'editor.reset')}</button>
+          <button className="btn primary" onClick={() => onExport([index])}><IconDownload />{tr('common.download')}</button>
         </div>
       </div>
       <div className="ed-body">
@@ -248,20 +249,20 @@ export default function Editor({ index, tpl, images, env, actions, history, tab,
             <div id="slotUI">
               {tpl.slots.length > 1 && rs.map((r, k) => (
                 <button key={k} className={'swap' + (swap && swap.from === k ? ' dragging' : '')} style={{ left: (r.x + r.w / 2) * 100 + '%', top: `calc(${r.y * 100}% + 10px)` }}
-                  title="Arraste até outra foto para trocar de lugar" aria-label={`Trocar a imagem ${k + 1} de lugar`}
+                  title={tr('editor.swapTitle')} aria-label={tr('editor.swapLabel', { n: k + 1 })}
                   onPointerDown={e => swapStart(e, k)} onPointerMove={swapMove} onPointerUp={swapEnd} onPointerCancel={swapEnd}>
                   <IconSwap />
                 </button>
               ))}
-              {target && <div className="swap-target" style={{ left: target.x * 100 + '%', top: target.y * 100 + '%', width: target.w * 100 + '%', height: target.h * 100 + '%' }}><span>Trocar aqui</span></div>}
+              {target && <div className="swap-target" style={{ left: target.x * 100 + '%', top: target.y * 100 + '%', width: target.w * 100 + '%', height: target.h * 100 + '%' }}><span>{tr('editor.swapHere')}</span></div>}
               {swap && <div className="swap-ghost" style={{ left: swap.x, top: swap.y, backgroundImage: swap.thumb ? `url(${swap.thumb})` : 'none' }} />}
             </div>
           </div>
-          <p className="hint">Arraste uma foto para reposicionar · role sobre ela para zoom · arraste um texto para movê-lo · arraste o ícone ⇄ de uma foto até outra para trocá-las de lugar</p>
+          <p className="hint">{tr('editor.hint')}</p>
         </div>
         <aside className="panel">
           <nav className="tabs" role="tablist">
-            {TABS.map(([id, label]) => <button key={id} className={'tab' + (tab === id ? ' on' : '')} role="tab" aria-selected={tab === id} onClick={() => { setTab(id); setFontOpen(false); }}>{label}</button>)}
+            {TABS.map(id => <button key={id} className={'tab' + (tab === id ? ' on' : '')} role="tab" aria-selected={tab === id} onClick={() => { setTab(id); setFontOpen(false); }}>{tr('editor.tab.' + id)}</button>)}
           </nav>
           <div id="pb" ref={pbRef}>
             {tab === 'imagens' && <ImagesPanel {...panelProps} slotSel={slotSel} setSlotSel={setSlotSel} />}

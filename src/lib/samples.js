@@ -1,5 +1,6 @@
 import { mk, rng, rrect, shade } from './util.js';
 import { blurCanvas } from './blur.js';
+import { tr } from './i18n.js';
 import { thumbURL } from './images.js';
 
 function glow(x, cx, cy, r, col){ const g = x.createRadialGradient(cx, cy, 0, cx, cy, r); g.addColorStop(0, col); g.addColorStop(1, col.replace(/[\d.]+\)$/, '0)')); x.fillStyle = g; x.fillRect(0, 0, x.canvas.width, x.canvas.height); }
@@ -99,7 +100,9 @@ function makeSample(name, fn, i){
   const im = x.getImageData(0, 0, W, H), d = im.data, r = rng(9 + i);
   for (let p = 0; p < d.length; p += 4){ const n = (r() - .5) * 14; d[p] += n; d[p + 1] += n; d[p + 2] += n; }
   x.putImageData(im, 0, 0);
-  return { id: 'ex-' + name, name: 'Exemplo · ' + name, w: W, h: H, src: c, prev: c, thumb: thumbURL(c, W, H), sample: true };
+  return { id: 'ex-' + name, scene: name, w: W, h: H, src: c, prev: c, thumb: thumbURL(c, W, H), sample: true };
 }
 let samples = null;
 export const sampleImages = () => samples || (samples = SCENES.map(([n, fn], i) => makeSample(n, fn, i)));
+/* Nome de uma still para a interface: o do arquivo ou, nos exemplos, o nome traduzido da cena */
+export const imgName = im => im.sample ? tr('stills.sample', { name: tr('scene.' + im.scene) }) : im.name;

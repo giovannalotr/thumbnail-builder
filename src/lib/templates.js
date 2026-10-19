@@ -1,46 +1,47 @@
 import { BW, clamp } from './util.js';
+import { tr } from './i18n.js';
 
 const R2 = (a, b) => ({ d: 'r', s: [1, 1], k: [a, b] });
 const C2 = (a, b) => ({ d: 'c', s: [1, 1], k: [a, b] });
 export const DEFS = [
-  { id: 'central', name: 'Imagem única', layout: 0, border: {},
+  { id: 'central', layout: 0, border: {},
     texts: [{ text: 'gentle days', font: 'Pinyon Script', size: 150, y: .52, color: '#F7EFDF', shadow: { blur: 26, op: .5 } }] },
-  { id: 'duo-lado', name: 'Duas lado a lado', layout: R2(0, 0), border: { gap: 4, color: '#F3EDE1' },
+  { id: 'duo-lado', layout: R2(0, 0), border: { gap: 4, color: '#F3EDE1' },
     texts: [
       { text: 'a cosy autumn vlog in', font: 'Cormorant Garamond', italic: true, weight: 500, size: 40, y: .12 },
       { text: 'the countryside', font: 'Playfair Display', weight: 600, size: 100, y: .235 },
       { text: 'england', font: 'Cormorant Garamond', italic: true, weight: 500, size: 36, x: .64, y: .33 }] },
-  { id: 'duo-empilhado', name: 'Duas empilhadas', layout: C2(0, 0), border: { gap: 4, color: '#F3EDE1' },
+  { id: 'duo-empilhado', layout: C2(0, 0), border: { gap: 4, color: '#F3EDE1' },
     texts: [
       { text: 'COSY AUTUMN', font: 'Cinzel', weight: 600, size: 96, ls: .03, y: .46 },
       { text: 'in the countryside', font: 'Italianno', size: 76, y: .6 }] },
-  { id: 'trio-colunas', name: 'Três colunas', layout: { d: 'r', s: [1, 1, 1], k: [0, 0, 0] }, border: { gap: 5, color: '#F3EDE1' },
+  { id: 'trio-colunas', layout: { d: 'r', s: [1, 1, 1], k: [0, 0, 0] }, border: { gap: 5, color: '#F3EDE1' },
     texts: [{ text: 'September in\nLondon', font: 'Bodoni Moda', size: 96, lh: .9, y: .56, shadow: { blur: 22, op: .5 } }] },
-  { id: 'trio-faixas', name: 'Três faixas', layout: { d: 'c', s: [1, 1, 1], k: [0, 0, 0] }, border: { gap: 5, color: '#EDE6D6' },
+  { id: 'trio-faixas', layout: { d: 'c', s: [1, 1, 1], k: [0, 0, 0] }, border: { gap: 5, color: '#EDE6D6' },
     texts: [{ text: 'slow mornings', font: 'Cormorant Garamond', italic: true, size: 104, y: .5, shadow: { on: false }, box: { mode: 'band-h', color: '#2A2119', op: .22, blur: 14, py: 14 } }] },
-  { id: 'destaque-esq', name: 'Destaque à esquerda', layout: { d: 'r', s: [2, 1], k: [0, C2(0, 0)] }, border: { gap: 6, color: '#EDE6D6' },
+  { id: 'destaque-esq', layout: { d: 'r', s: [2, 1], k: [0, C2(0, 0)] }, border: { gap: 6, color: '#EDE6D6' },
     texts: [
       { text: 'A COSY AUTUMN VLOG', font: 'Cormorant Garamond', weight: 500, size: 52, ls: .14, x: .36, y: .45 },
       { text: 'in the Cotswolds', font: 'Pinyon Script', size: 46, x: .36, y: .555 }] },
-  { id: 'destaque-dir', name: 'Destaque à direita', layout: { d: 'r', s: [1, 2], k: [C2(0, 0), 0] }, border: { outer: 20, gap: 8, radius: 4, color: '#EDE6D6', tex: 'ramagem', amt: .75 },
+  { id: 'destaque-dir', layout: { d: 'r', s: [1, 2], k: [C2(0, 0), 0] }, border: { outer: 20, gap: 8, radius: 4, color: '#EDE6D6', tex: 'ramagem', amt: .75 },
     texts: [{ text: 'life in the countryside', font: 'Cormorant Garamond', italic: true, weight: 500, size: 62, x: .655, y: .83, color: '#F3E7C9' }] },
-  { id: 'quadrantes', name: 'Quatro quadrantes', layout: C2(R2(0, 0), R2(0, 0)), border: { gap: 5, color: '#F3EDE1' },
+  { id: 'quadrantes', layout: C2(R2(0, 0), R2(0, 0)), border: { gap: 5, color: '#F3EDE1' },
     texts: [
       { text: 'COTSWOLDS', font: 'Cinzel', weight: 700, size: 100, ls: .04, y: .47, box: { mode: 'box', color: '#1E1A16', op: .22, blur: 12, px: 34, py: 14, r: 6 } },
       { text: 'cosy autumn day', font: 'Italianno', size: 72, y: .615 }] },
-  { id: 'trio-largo', name: 'Centro largo', layout: { d: 'r', s: [1, 2, 1], k: [0, 0, 0] }, border: { outer: 16, gap: 6, radius: 3, color: '#EFE8D8', tex: 'ramagem', amt: .65 },
+  { id: 'trio-largo', layout: { d: 'r', s: [1, 2, 1], k: [0, 0, 0] }, border: { outer: 16, gap: 6, radius: 3, color: '#EFE8D8', tex: 'ramagem', amt: .65 },
     texts: [
       { text: 'coffee shops, shopping, nature walks', font: 'Cormorant Garamond', italic: true, weight: 500, size: 21, ls: .02, y: .525 },
       { text: 'a slow sunday', font: 'Playfair Display', italic: true, size: 78, y: .615 },
       { text: 'vlog', font: 'Cormorant Garamond', italic: true, weight: 500, size: 30, x: .63, y: .705 }] },
-  { id: 'destaque-tres', name: 'Destaque + três', layout: { d: 'r', s: [3, 2], k: [0, { d: 'c', s: [1, 1, 1], k: [0, 0, 0] }] }, border: { gap: 5, color: '#F3EDE1' },
+  { id: 'destaque-tres', layout: { d: 'r', s: [3, 2], k: [0, { d: 'c', s: [1, 1, 1], k: [0, 0, 0] }] }, border: { gap: 5, color: '#F3EDE1' },
     texts: [{ text: 'countryside diaries', font: 'Great Vibes', size: 92, x: .3, y: .8 }] },
-  { id: 'mosaico', name: 'Mosaico de cinco', layout: { d: 'r', s: [1, 1.5, 1], k: [C2(0, 0), 0, C2(0, 0)] }, border: { gap: 5, color: '#F3EDE1' },
+  { id: 'mosaico', layout: { d: 'r', s: [1, 1.5, 1], k: [C2(0, 0), 0, C2(0, 0)] }, border: { gap: 5, color: '#F3EDE1' },
     texts: [
       { text: 'decorating for autumn', font: 'Cormorant Garamond', italic: true, weight: 500, size: 36, y: .1 },
       { text: 'cosy home vlog', font: 'Bodoni Moda', weight: 600, size: 86, y: .2 },
       { text: 'england', font: 'Cormorant Garamond', italic: true, weight: 500, size: 30, x: .6, y: .285 }] },
-  { id: 'faixa', name: 'Faixa de título', layout: { d: 'c', s: [1, .5, 1], k: [0, 'x', 0] }, border: { color: '#EFE4CC', tex: 'papel', amt: .75 },
+  { id: 'faixa', layout: { d: 'c', s: [1, .5, 1], k: [0, 'x', 0] }, border: { color: '#EFE4CC', tex: 'papel', amt: .75 },
     texts: [
       { text: 'COSY OCTOBER', font: 'Cinzel', weight: 600, size: 56, ls: .1, color: '#3B322A', y: .474, shadow: { on: false } },
       { text: 'in the Cotswolds', font: 'Pinyon Script', size: 36, color: '#6B5544', y: .55, shadow: { on: false } }] },
@@ -58,6 +59,7 @@ export function makeTpl(def){
   return { def, slots: Array.from({ length: countSlots(def.layout) }, () => ({ img: null, zoom: 1, px: 0, py: 0, flip: false })),
     texts: def.texts.map(o => makeText(JSON.parse(JSON.stringify(o)))), border: makeBorder(def.border), pick: false, edited: false };
 }
+export const tplName = t => tr('tpl.' + t.def.id);
 function lay(n, x, y, w, h, g, out){
   if (n === 0){ out.push({ x, y, w, h }); return; }
   if (n === 'x') return;

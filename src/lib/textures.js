@@ -1,11 +1,7 @@
 import { clamp, mk, rng } from './util.js';
 
-export const TEXTURES = [
-  { id: 'none', name: 'Lisa' }, { id: 'grao', name: 'Grão fino' }, { id: 'filme', name: 'Grão de filme' },
-  { id: 'papel', name: 'Papel' }, { id: 'linho', name: 'Linho' }, { id: 'tela', name: 'Tela' },
-  { id: 'pontilhado', name: 'Pontilhado' }, { id: 'fibras', name: 'Kraft' }, { id: 'aquarela', name: 'Aquarela' },
-  { id: 'ramagem', name: 'Ramagem' },
-];
+/* ids das texturas; os nomes ficam em locales/ (texture.<id>) */
+export const TEXTURES = ['none', 'grao', 'filme', 'papel', 'linho', 'tela', 'pontilhado', 'fibras', 'aquarela', 'ramagem'];
 const TS = 384, TEX_CACHE = {};
 function vnoise(size, P, r){
   const g = new Float32Array(P * P); for (let i = 0; i < g.length; i++) g[i] = r();

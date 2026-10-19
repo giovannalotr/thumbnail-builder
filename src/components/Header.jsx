@@ -1,12 +1,19 @@
-import { IconUpload } from './icons.jsx';
+import { Fragment } from 'react';
+import { LANGS, getLang, setLang } from '../lib/i18n.js';
+import { useTr } from '../state.js';
 
-export default function Header({ onFiles }){
+export default function Header(){
+  const tr = useTr(), lang = getLang();
   return (
     <header className="top"><div className="top-in gut">
-      <div className="brand"><span className="mark">Thumb Builder</span><span className="tag">thumbnails a partir das suas stills</span></div>
-      <div className="row">
-        <label className="btn primary" htmlFor="file"><IconUpload />Enviar stills</label>
-        <input id="file" type="file" accept="image/*" multiple hidden onChange={e => { if (e.target.files.length) onFiles(e.target.files); e.target.value = ''; }} />
+      <div className="brand"><span className="mark">Thumb Builder</span><span className="tag">{tr('header.tagline')}</span></div>
+      <div className="lang" role="group" aria-label={tr('header.language')}>
+        {LANGS.map((L, i) => (
+          <Fragment key={L.id}>
+            {i > 0 && <span className="sep" aria-hidden="true" />}
+            <button lang={L.id} title={L.name} className={L.id === lang ? 'on' : undefined} aria-pressed={L.id === lang} onClick={() => setLang(L.id)}>{L.short}</button>
+          </Fragment>
+        ))}
       </div>
     </div></header>
   );

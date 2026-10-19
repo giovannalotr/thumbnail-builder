@@ -1,7 +1,9 @@
 import { useEffect, useId, useRef } from 'react';
+import { fmtNum } from '../lib/i18n.js';
 import { paintTexture } from '../lib/textures.js';
+import { useTr } from '../state.js';
 
-const FMT = { pct: v => Math.round(v * 100) + '%', px: v => Math.round(v) + ' px', em: v => (v * 100).toFixed(0) + '%', x: v => v.toFixed(2) + '×', pos: v => Math.round(v * 100) + '%', off: v => Math.round(v * 100) };
+const FMT = { pct: v => Math.round(v * 100) + '%', px: v => Math.round(v) + ' px', em: v => (v * 100).toFixed(0) + '%', x: v => fmtNum(v, 2) + '×', pos: v => Math.round(v * 100) + '%', off: v => Math.round(v * 100) };
 
 export function Range({ label, value, min, max, step, fmt, onChange }){
   const id = useId();
@@ -14,11 +16,11 @@ export function Range({ label, value, min, max, step, fmt, onChange }){
 }
 
 export function Swatches({ value, colors, onChange }){
-  const v = (value || '').toLowerCase();
+  const tr = useTr(), v = (value || '').toLowerCase();
   return (
     <div className="sw">
-      {colors.map(c => <button key={c} className={'swb' + (v === c.toLowerCase() ? ' on' : '')} style={{ background: c }} aria-label={`Cor ${c}`} onClick={() => onChange(c)} />)}
-      <input type="color" value={value} onChange={e => onChange(e.target.value)} aria-label="Escolher outra cor" />
+      {colors.map(c => <button key={c} className={'swb' + (v === c.toLowerCase() ? ' on' : '')} style={{ background: c }} aria-label={tr('controls.color', { c })} onClick={() => onChange(c)} />)}
+      <input type="color" value={value} onChange={e => onChange(e.target.value)} aria-label={tr('controls.otherColor')} />
     </div>
   );
 }

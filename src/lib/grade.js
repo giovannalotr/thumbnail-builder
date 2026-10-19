@@ -2,16 +2,16 @@ import { BW, clamp, rng } from './util.js';
 
 const NEU = { exp: 0, con: 0, sat: 1, warm: 0, tint: 0, fade: 0, sh: [0, 0, 0], shA: 0, hi: [255, 255, 255], hiA: 0, grain: 0, vig: 0 };
 export const FILTERS = [
-  { id: 'natural', name: 'Cor natural', p: {} },
-  { id: 'quente', name: 'Tons quentes', p: { warm: .13, sat: .96, con: .05, hi: [255, 200, 140], hiA: .09 } },
-  { id: 'fosco', name: 'Suave e fosco', p: { fade: .13, con: -.17, sat: .82, exp: .03, hi: [255, 240, 225], hiA: .05 } },
-  { id: 'dourado', name: 'Outono dourado', p: { warm: .17, sat: 1.08, con: .08, hi: [255, 186, 92], hiA: .15, sh: [80, 48, 28], shA: .1 } },
-  { id: 'vela', name: 'Luz de vela', p: { warm: .22, exp: -.1, con: .1, sat: .9, sh: [72, 36, 16], shA: .2, hi: [255, 192, 122], hiA: .12, vig: .3 } },
-  { id: 'filme', name: 'Filme antigo', p: { fade: .1, con: .04, sat: .78, sh: [30, 62, 56], shA: .13, hi: [255, 222, 172], hiA: .1, grain: .45 } },
-  { id: 'cha', name: 'Chá com leite', p: { fade: .14, con: -.12, sat: .78, warm: .1, hi: [250, 230, 205], hiA: .12, exp: .04 } },
-  { id: 'musgo', name: 'Musgo e névoa', p: { sat: .72, fade: .08, sh: [46, 70, 46], shA: .17, hi: [236, 236, 214], hiA: .06, con: -.06, warm: .03 } },
-  { id: 'nublado', name: 'Manhã nublada', p: { warm: -.05, sat: .8, fade: .08, con: -.1, exp: .04, hi: [225, 232, 240], hiA: .06 } },
-  { id: 'sepia', name: 'Sépia suave', p: { sat: .42, warm: .14, fade: .06, hi: [240, 210, 165], hiA: .12, sh: [72, 50, 34], shA: .12 } },
+  { id: 'natural', p: {} },
+  { id: 'quente', p: { warm: .13, sat: .96, con: .05, hi: [255, 200, 140], hiA: .09 } },
+  { id: 'fosco', p: { fade: .13, con: -.17, sat: .82, exp: .03, hi: [255, 240, 225], hiA: .05 } },
+  { id: 'dourado', p: { warm: .17, sat: 1.08, con: .08, hi: [255, 186, 92], hiA: .15, sh: [80, 48, 28], shA: .1 } },
+  { id: 'vela', p: { warm: .22, exp: -.1, con: .1, sat: .9, sh: [72, 36, 16], shA: .2, hi: [255, 192, 122], hiA: .12, vig: .3 } },
+  { id: 'filme', p: { fade: .1, con: .04, sat: .78, sh: [30, 62, 56], shA: .13, hi: [255, 222, 172], hiA: .1, grain: .45 } },
+  { id: 'cha', p: { fade: .14, con: -.12, sat: .78, warm: .1, hi: [250, 230, 205], hiA: .12, exp: .04 } },
+  { id: 'musgo', p: { sat: .72, fade: .08, sh: [46, 70, 46], shA: .17, hi: [236, 236, 214], hiA: .06, con: -.06, warm: .03 } },
+  { id: 'nublado', p: { warm: -.05, sat: .8, fade: .08, con: -.1, exp: .04, hi: [225, 232, 240], hiA: .06 } },
+  { id: 'sepia', p: { sat: .42, warm: .14, fade: .06, hi: [240, 210, 165], hiA: .12, sh: [72, 50, 34], shA: .12 } },
 ];
 const NOISE = (() => { const r = rng(7), a = new Float32Array(65536); for (let i = 0; i < a.length; i++) a[i] = (r() + r() + r() - 1.5) / 1.5; return a; })();
 export function makeGrade(fid, amt, gr, vg){

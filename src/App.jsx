@@ -8,7 +8,7 @@ import { exportTpls } from './lib/exporter.js';
 import { makeGrade } from './lib/grade.js';
 import { decodeImages, isImageFile } from './lib/images.js';
 import { toast } from './lib/toast.js';
-import { useStore } from './state.js';
+import { useStore, useTr } from './state.js';
 
 function useDebounced(value, ms){
   const [v, setV] = useState(value);
@@ -18,6 +18,7 @@ function useDebounced(value, ms){
 
 export default function App(){
   const [state, actions] = useStore();
+  const tr = useTr();
   const [editing, setEditing] = useState(null);
   const [edTab, setEdTab] = useState('imagens');
   const [dropping, setDropping] = useState(false);
@@ -36,12 +37,12 @@ export default function App(){
 
   const loadFiles = useCallback(async files => {
     const list = [...files].filter(isImageFile);
-    if (!list.length){ toast('Nenhuma imagem encontrada. Envie arquivos JPG, PNG ou WebP.'); return; }
-    toast(`Carregando ${list.length} ${list.length > 1 ? 'stills' : 'still'}…`, 1600);
+    if (!list.length){ toast(tr('files.none')); return; }
+    toast(tr('files.loading', { n: list.length }), 1600);
     const { added, failed } = await decodeImages(list);
-    if (!added.length){ toast('Não consegui abrir essas imagens. Envie em JPG, PNG ou WebP.'); return; }
+    if (!added.length){ toast(tr('files.failedAll')); return; }
     actions.addImages(added);
-    if (failed.length) toast(`Não abri: ${failed.join(', ')}. Use JPG, PNG ou WebP.`, 4200);
+    if (failed.length) toast(tr('files.failedSome', { names: failed.join(', ') }), 4200);
   }, [actions]);
 
   // Arrastar arquivos para qualquer ponto da janela
@@ -65,12 +66,12 @@ export default function App(){
 
   return (
     <>
-      <Header onFiles={loadFiles} />
+      <Header />
       {editing == null
-        ? <GridView state={state} actions={actions} env={gridEnv} onEdit={setEditing} onExport={onExport} onRemoveImage={removeImage} />
+        ? <GridView state={state} actions={actions} env={gridEnv} onEdit={setEditing} onExport={onExport} onFiles={loadFiles} onRemoveImage={removeImage} />
         : <Editor key={editing} index={editing} tpl={state.tpls[editing]} images={images} env={env} actions={actions} history={histories[editing]}
             tab={edTab} setTab={setEdTab} prevBg={prevBg} onPrevBg={setPrevBg} onClose={() => setEditing(null)} onExport={onExport} />}
-      <div id="drop" hidden={!dropping}>Solte as stills aqui</div>
+      <div id="drop" hidden={!dropping}>{tr('files.drop')}</div>
       <Toast />
     </>
   );

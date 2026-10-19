@@ -29,7 +29,7 @@ export const FONTS = [
   F('Homemade Apple', 'mao'), F('La Belle Aurore', 'mao'), F('Caveat', 'mao', [400, 500, 600, 700]),
   F('Dancing Script', 'mao', [400, 500, 600, 700]), F('Nothing You Could Do', 'mao'), F('Cedarville Cursive', 'mao'),
 ];
-export const FCATS = [['texto', 'Serifadas de texto'], ['titulo', 'Serifadas de título'], ['cali', 'Caligráficas'], ['mao', 'Escrita à mão']];
+export const FCATS = ['texto', 'titulo', 'cali', 'mao'];
 export const fontByName = n => FONTS.find(f => f.n === n) || FONTS[0];
 /* CSS do Google Fonts de cada família; document.fonts.load só encontra a fonte depois que esse CSS carrega */
 const sheets = new Map();
